@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ichefz Partner</string>
+    <string name="new_order_number">Order number: %1$s</string>
+    <string name="new_order_person">Person:%1$s</string>
+    <string name="new_order_quantity">Quantity:%1$s</string>
+    <string name="new_order_notes">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;%1$s</string>
+    <string name="finance_item_order_number">Order number:&#160;%1$s</string>
+    <string name="my_menu_person2">Persons 2:&#160;$%1$s</string>
+    <string name="my_menu_person4">Persons 4:&#160;$%1$s</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="title_bar_height">48dp</dimen>
+    <dimen name="pull_auto_load_footer_dis">48dp</dimen>
+    <dimen name="pull_refresh_footer_dis">60dp</dimen>
+    <dimen name="pull_refresh_header_dis">60dp</dimen>
+</resources>

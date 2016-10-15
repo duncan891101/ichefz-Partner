@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 下拉刷新和上拉加载更多的文本 -->
+    <string name="pull_to_refresh_header_hint_normal">Pull refresh</string>
+    <string name="pull_to_refresh_header_hint_normal2">Pull load</string>
+    <string name="pull_to_refresh_header_hint_ready">Release refresh</string>
+    <string name="pull_to_refresh_header_hint_loading">Loading...</string>
+    <string name="pull_to_refresh_header_hint_refresh">Refreshing...</string>
+    <string name="pull_to_refresh_footer_hint_ready">Release load</string>
+    <string name="pull_to_refresh_no_more_data">No more data</string>
+    <string name="pull_to_refresh_net_work_error">Network error</string>
+    <string name="pull_to_refresh_load_exception">Failed to load, please reload</string>
+    <string name="pull_to_refresh_refreshing">Refreshing</string>
+    <string name="pull_to_refresh_loading">Loading</string>
+</resources>
