@@ -1,15 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F3F3F3">
+    android:background="#F3F3F3"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/white">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_menu"
+            android:layout_width="160dp"
+            android:layout_height="80dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp" />
+
+        <ImageView
+            android:id="@+id/iv_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/to_be_verified"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/rv_menu"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toRightOf="@id/rv_menu"
+            android:maxLines="2"
+            android:text="Shrim meat with roommmoei"
+            android:textColor="#0099CC"
+            android:textSize="13dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_person4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/rv_menu"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/rv_menu"
+            android:text="Persons 4"
+            android:textColor="#333333"
+            android:textSize="13dp" />
+
+        <TextView
+            android:id="@+id/tv_person2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/tv_person4"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/rv_menu"
+            android:text="Persons 2"
+            android:textColor="#333333"
+            android:textSize="13dp" />
+
+        <ImageView
+            android:id="@+id/iv_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:padding="5dp"
+            android:src="@mipmap/arrow_down" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/ll_hint_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="50dp"
         android:layout_marginRight="10dp"
         android:orientation="horizontal">
 
@@ -83,74 +153,4 @@
         </RelativeLayout>
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@android:color/white">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_menu"
-            android:layout_width="160dp"
-            android:layout_height="80dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp" />
-
-        <ImageView
-            android:id="@+id/iv_tag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/to_be_verified"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/rv_menu"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_toRightOf="@id/rv_menu"
-            android:maxLines="2"
-            android:text="Shrim meat with roommmoei"
-            android:textColor="#0099CC"
-            android:textSize="13dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tv_person4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/rv_menu"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/rv_menu"
-            android:text="Persons 4"
-            android:textColor="#333333"
-            android:textSize="13dp" />
-
-        <TextView
-            android:id="@+id/tv_person2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/tv_person4"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/rv_menu"
-            android:text="Persons 2"
-            android:textColor="#333333"
-            android:textSize="13dp" />
-
-        <ImageView
-            android:id="@+id/iv_arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:padding="5dp"
-            android:src="@mipmap/arrow_down" />
-
-    </RelativeLayout>
-
-</RelativeLayout>
+</LinearLayout>
