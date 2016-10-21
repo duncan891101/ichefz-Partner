@@ -98,6 +98,8 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         if (mOutDateDialog == null || !mOutDateDialog.isShowing()) {
             mOutDateDialog = DialogUtils.showConfirmDialog(this, R.layout.confirm_dialog_layout, false);
         }
+        TextView titleTv = (TextView) mOutDateDialog.findViewById(R.id.tv_title);
+        titleTv.setText("Login");
         TextView textTv = (TextView) mOutDateDialog.findViewById(R.id.tv_text);
         textTv.setText("User identity authentication failed. Please login again");
         TextView confirmTv = (TextView) mOutDateDialog.findViewById(R.id.tv_confirm);

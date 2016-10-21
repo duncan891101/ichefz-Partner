@@ -7,7 +7,7 @@ public class NetworkConstants {
 
     public static final String MAIN_SERVER_URL = "https://www.ichefz.com/Apis/"; // 主机地址
 
-    public static final int NET_CONNECT_TIMEOUT = 20; // 网络连接超时时间，单位秒
+    public static final int NET_CONNECT_TIMEOUT = 30; // 网络连接超时时间，单位秒
 
     public static final int NET_READ_TIMEOUT = 80; // 网络读取超时时间，单位秒
 
@@ -35,7 +35,7 @@ public class NetworkConstants {
 
     public static final String API_VERSION_NAME = "api_verson";
 
-    public static final String API_VERSION_VALUE = "2.0"; // 目前接口版本号
+    public static final String API_VERSION_VALUE = "3.0"; // 目前接口版本号
 
     public static final String TIME_STAMP_NAME = "api_timstamp";
 

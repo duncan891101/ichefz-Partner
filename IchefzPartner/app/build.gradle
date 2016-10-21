@@ -33,4 +33,5 @@ dependencies {
     compile 'com.trello:rxlifecycle-components:0.5.0'
     compile files('libs/universal-image-loader-1.9.4-with-sources.jar')
     compile files('libs/commons-codec-1.8.jar')
+    compile files('libs/eventbus-3.0.0-beta1.jar')
 }

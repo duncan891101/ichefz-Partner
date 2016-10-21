@@ -127,5 +127,28 @@ public class DialogUtils {
         return dialog;
     }
 
+    public static Dialog showChooseAvatarDialog(Context context, int layoutId, boolean backKeyFinishDialog, boolean touchOutsideFinish) {
+        Activity activity = (Activity) context;
+        while (activity.getParent() != null) {
+            activity = activity.getParent();
+        }
+        Dialog dialog = new Dialog(activity, R.style.choose_avatar_dialog_style);
+        dialog.setContentView(layoutId);
+
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams params = window.getAttributes();
+        window.setGravity(Gravity.BOTTOM);
+
+        params.width = GlobalConstants.SCREEN_WIDTH - PartnerUtils.dip2px(context, 20);
+        params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(params);
+
+        dialog.setCancelable(backKeyFinishDialog);
+        dialog.setCanceledOnTouchOutside(touchOutsideFinish);
+
+        dialog.show();
+        return dialog;
+    }
+
 
 }

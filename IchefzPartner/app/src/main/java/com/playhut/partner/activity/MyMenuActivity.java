@@ -1,6 +1,7 @@
 package com.playhut.partner.activity;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -183,14 +184,14 @@ public class MyMenuActivity extends BaseActivity implements View.OnClickListener
                 @Override
                 public void onClick(View v) {
                     dismissPopupWindow();
-
+                    startActivity(new Intent(MyMenuActivity.this, AddPackActivity.class));
                 }
             });
             addSetTv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     dismissPopupWindow();
-
+                    startActivity(new Intent(MyMenuActivity.this, AddSetActivity.class));
                 }
             });
         }

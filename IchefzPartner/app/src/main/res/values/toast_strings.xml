@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upload_avatar_get_pic_fail">Failed to get the picture</string>
+    <string name="upload_avatar_crop_pic_fail">Failed to crop the picture</string>
+    <string name="upload_avatar_save_pic_fail">Failed to save the picture</string>
+    <string name="upload_avatar_fail">Failed to upload avatar</string>
+
+    <string name="change_info_save_empty">Save the info cannot be empty</string>
+
+    <string name="select_pack_must_4">You must select four item</string>
+</resources>

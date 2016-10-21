@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <style name="base_dialog" parent="@android:style/Theme.Dialog">
@@ -53,6 +54,13 @@
         <item name="android:windowBackground">@drawable/send_msg_dialog_bg_shape</item>
         <!-- 对话框透明色的背景不显示 -->
         <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <!-- 上传头像对话框样式 -->
+    <style name="choose_avatar_dialog_style" parent="base_dialog">
+        <item name="android:windowBackground">@color/choose_avatar_window_bg</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowAnimationStyle">@style/bottom_dialog_anim_style</item>
     </style>
 
 </resources>

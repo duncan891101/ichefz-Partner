@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -14,9 +16,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.playhut.partner.network.Md5;
+
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,15 +52,18 @@ public class PartnerUtils {
      * @return
      */
     public static String getDeviceId(Context context) {
-        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = tm.getDeviceId();
-        if (TextUtils.isEmpty(deviceId)) {
-            deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-            if (TextUtils.isEmpty(deviceId)) {
-                deviceId = "";
-            }
+        // 由于READ_PHONE_STATE权限在6.0上不能配置在配置文件上，必须动态询问用户才能有用，所以TelephonyManager getDeviceId在6.0上获取不到
+        StringBuilder deviceId = new StringBuilder("and");
+        String serialNumber = Build.SERIAL;
+        if (!TextUtils.isEmpty(serialNumber)){
+            deviceId.append(serialNumber);
         }
-        return deviceId;
+        deviceId.append("_");
+        String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        if (!TextUtils.isEmpty(androidId)){
+            deviceId.append(androidId);
+        }
+        return Md5.md5Digest(deviceId.toString());
     }
 
     /**

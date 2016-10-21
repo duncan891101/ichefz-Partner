@@ -1,4 +1,4 @@
-package com.playhut.partner.networkapi;
+package com.playhut.partner.network;
 
 
 import com.playhut.partner.constants.NetworkConstants;

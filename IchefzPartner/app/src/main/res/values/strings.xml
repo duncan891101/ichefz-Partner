@@ -7,4 +7,8 @@
     <string name="finance_item_order_number">Order number:&#160;%1$s</string>
     <string name="my_menu_person2">Persons 2:&#160;$%1$s</string>
     <string name="my_menu_person4">Persons 4:&#160;$%1$s</string>
+
+    <string name="chef_detail_ingredients">Ingredients</string>
+    <string name="chef_detail_instructions">Instructions</string>
+    <string name="chef_detail_tips">Tips &#038; Techniques</string>
 </resources>

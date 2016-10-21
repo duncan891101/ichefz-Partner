@@ -167,6 +167,8 @@ public class MessageDetailActivity extends BaseActivity {
         if (mDeleteDialog == null || !mDeleteDialog.isShowing()) {
             mDeleteDialog = DialogUtils.showConfirmDialog(this, R.layout.confirm_dialog_layout, true);
         }
+        TextView titleTv = (TextView) mDeleteDialog.findViewById(R.id.tv_title);
+        titleTv.setText("Delete");
         TextView textTv = (TextView) mDeleteDialog.findViewById(R.id.tv_text);
         textTv.setText("Are you sure to delete the selected message?");
         TextView confirmTv = (TextView) mDeleteDialog.findViewById(R.id.tv_confirm);

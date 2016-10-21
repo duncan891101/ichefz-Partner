@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="#F5F5F5"
     android:orientation="vertical">
 
     <include layout="@layout/title_bar" />
@@ -29,6 +29,7 @@
         android:focusableInTouchMode="true" />
 
     <EditText
+        android:id="@+id/et_feedback"
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:layout_marginLeft="10dp"
@@ -42,17 +43,23 @@
         android:textCursorDrawable="@null"
         android:textSize="14dp" />
 
-    <Button
-        style="?android:attr/borderlessButtonStyle"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="40dp"
-        android:background="#0099CC"
-        android:text="Send"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="16dp" />
+        android:layout_height="match_parent">
 
+        <Button
+            android:id="@+id/btn_send"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:background="#0099CC"
+            android:text="Send"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16dp" />
+    </RelativeLayout>
 </LinearLayout>

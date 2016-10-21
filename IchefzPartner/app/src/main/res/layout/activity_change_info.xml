@@ -25,17 +25,17 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:visibility="gone"
-            android:src="@mipmap/change_info_clean" />
+            android:src="@mipmap/change_info_clean"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/et_input"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
-            android:background="@null"
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@id/iv_clean"
+            android:background="@null"
             android:singleLine="true"
             android:textColor="#333333"
             android:textCursorDrawable="@null"
@@ -43,17 +43,23 @@
 
     </RelativeLayout>
 
-    <Button
-        style="?android:attr/borderlessButtonStyle"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="70dp"
-        android:background="#0099CC"
-        android:text="Save"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="16dp" />
+        android:layout_height="match_parent">
 
+        <Button
+            android:id="@+id/btn_save"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:background="#0099CC"
+            android:text="Save"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16dp" />
+    </RelativeLayout>
 </LinearLayout>

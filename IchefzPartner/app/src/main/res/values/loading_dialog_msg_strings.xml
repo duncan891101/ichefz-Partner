@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loading_dialog_loading">Loading...</string>
+    <string name="loading_dialog_login">Login...</string>
+    <string name="loading_dialog_logout">Logout...</string>
+    <string name="loading_dialog_sign">Sign Up...</string>
+    <string name="loading_dialog_submit">Submit...</string>
+    <string name="loading_dialog_send">Sending...</string>
+    <string name="loading_dialog_upload">Upload...</string>
+    <string name="loading_dialog_setting">Setting...</string>
+</resources>
