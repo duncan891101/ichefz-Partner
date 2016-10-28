@@ -230,7 +230,7 @@ public class ChangeInfoActivity extends BaseActivity implements TextWatcher, Vie
                 titleBar.setCenterTvContent("Subtitle");
                 break;
             case ChangeTypeConstants.KITCHEN_SUMMERY:
-                titleBar.setCenterTvContent("Kitchen summery");
+                titleBar.setCenterTvContent("Kitchen summary");
                 break;
             case ChangeTypeConstants.SHIP_DAY:
                 titleBar.setCenterTvContent("Ship day");

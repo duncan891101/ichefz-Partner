@@ -77,6 +77,28 @@ public class DialogUtils {
         return dialog;
     }
 
+    public static Dialog showRelayDialog(final Context context, int layoutId, boolean backKeyFinishDialog, boolean touchOutsideFinish) {
+        Activity activity = (Activity) context;
+        while (activity.getParent() != null) {
+            activity = activity.getParent();
+        }
+        Dialog dialog = new Dialog(activity, R.style.bottom_dialog_no_dim_style);
+        dialog.setContentView(layoutId);
+
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams params = window.getAttributes();
+        window.setGravity(Gravity.BOTTOM);
+
+        params.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+        params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(params);
+
+        dialog.setCancelable(backKeyFinishDialog);
+        dialog.setCanceledOnTouchOutside(touchOutsideFinish);
+
+        return dialog;
+    }
+
     public static Dialog showConfirmDialog(Context context, int layoutId, boolean backKeyCanCancel) {
         Activity activity = (Activity) context;
         while (activity.getParent() != null) {
@@ -96,32 +118,6 @@ public class DialogUtils {
 
         dialog.setCancelable(backKeyCanCancel);
         dialog.setCanceledOnTouchOutside(false);
-
-        dialog.show();
-        return dialog;
-    }
-
-    /**
-     * 回复消息时用的Dialog
-     */
-    public static Dialog showSendMessageDialog(Context context, int layoutId, boolean backKeyFinishDialog, boolean touchOutsideFinish) {
-        Activity activity = (Activity) context;
-        while (activity.getParent() != null) {
-            activity = activity.getParent();
-        }
-        Dialog dialog = new Dialog(activity, R.style.send_msg_dialog_style);
-        dialog.setContentView(layoutId);
-
-        Window window = dialog.getWindow();
-        WindowManager.LayoutParams params = window.getAttributes();
-        window.setGravity(Gravity.CENTER);
-
-        params.width = GlobalConstants.SCREEN_WIDTH - PartnerUtils.dip2px(context, 20);
-        params.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-        window.setAttributes(params);
-
-        dialog.setCancelable(backKeyFinishDialog);
-        dialog.setCanceledOnTouchOutside(touchOutsideFinish);
 
         dialog.show();
         return dialog;
@@ -149,6 +145,5 @@ public class DialogUtils {
         dialog.show();
         return dialog;
     }
-
 
 }

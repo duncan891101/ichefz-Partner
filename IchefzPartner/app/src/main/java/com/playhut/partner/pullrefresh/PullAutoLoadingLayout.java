@@ -1,6 +1,7 @@
 package com.playhut.partner.pullrefresh;
 
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,30 +57,37 @@ public class PullAutoLoadingLayout extends LoadingLayout {
 
     @Override
     protected void onReset() {
-        mLoadingIv.setVisibility(View.VISIBLE);
-        mHintView.setText(R.string.pull_to_refresh_header_hint_loading);
+        mLoadingIv.clearAnimation();
+        mLoadingIv.setVisibility(View.GONE);
+        mHintView.setText(R.string.pull_to_refresh_more_data);
     }
 
     @Override
     protected void onRefreshing() {
+        mLoadingIv.clearAnimation();
         mLoadingIv.setVisibility(View.VISIBLE);
+        AnimationDrawable ad = (AnimationDrawable) mLoadingIv.getDrawable();
+        ad.start();
         mHintView.setText(R.string.pull_to_refresh_header_hint_loading);
     }
 
     @Override
     protected void onNoMoreData() {
+        mLoadingIv.clearAnimation();
         mLoadingIv.setVisibility(View.GONE);
         mHintView.setText(R.string.pull_to_refresh_no_more_data);
     }
 
     @Override
     protected void onNetWorkError() {
+        mLoadingIv.clearAnimation();
         mLoadingIv.setVisibility(View.GONE);
         mHintView.setText(R.string.pull_to_refresh_net_work_error);
     }
 
     @Override
     protected void onLoadException() {
+        mLoadingIv.clearAnimation();
         mLoadingIv.setVisibility(View.GONE);
         mHintView.setText(R.string.pull_to_refresh_load_exception);
     }

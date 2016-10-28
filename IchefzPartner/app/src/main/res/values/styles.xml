@@ -35,6 +35,13 @@
         <item name="android:windowAnimationStyle">@style/bottom_dialog_anim_style</item>
     </style>
 
+    <!-- 底部弹起对话框的样式 -->
+    <style name="bottom_dialog_no_dim_style" parent="base_dialog">
+        <item name="android:windowBackground">@drawable/bottom_dialog_bg_shape</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@style/bottom_dialog_anim_style</item>
+    </style>
+
     <style name="confirm_dialog_no_anim" parent="base_dialog">
         <item name="android:windowBackground">@drawable/confirm_dialog_bg_shape</item>
         <item name="android:backgroundDimEnabled">true</item>
@@ -46,14 +53,6 @@
         <item name="android:numStars">5</item>
         <item name="android:minHeight">20dp</item>
         <item name="android:maxHeight">20dp</item>
-    </style>
-
-    <!-- 发送消息对话框样式 -->
-    <style name="send_msg_dialog_style" parent="@style/base_dialog">
-        <!-- 对话框显示的那部分背景 -->
-        <item name="android:windowBackground">@drawable/send_msg_dialog_bg_shape</item>
-        <!-- 对话框透明色的背景不显示 -->
-        <item name="android:backgroundDimEnabled">false</item>
     </style>
 
     <!-- 上传头像对话框样式 -->

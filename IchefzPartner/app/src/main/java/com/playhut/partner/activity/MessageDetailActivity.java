@@ -9,18 +9,33 @@ import android.widget.TextView;
 import com.playhut.partner.R;
 import com.playhut.partner.adapter.MessageDetailAdapter;
 import com.playhut.partner.base.BaseActivity;
+import com.playhut.partner.business.LoadFailureBusiness;
+import com.playhut.partner.constants.NetworkConstants;
+import com.playhut.partner.debug.MyLog;
 import com.playhut.partner.entity.MessageDetailEntity;
+import com.playhut.partner.mvp.presenter.IDeleteMsgPresent;
+import com.playhut.partner.mvp.presenter.IMessageDetailPresent;
+import com.playhut.partner.mvp.presenter.impl.DeleteMsgPresent;
+import com.playhut.partner.mvp.presenter.impl.MessageDetailPresent;
+import com.playhut.partner.mvp.view.DeleteMsgView;
+import com.playhut.partner.mvp.view.MessageDetailView;
+import com.playhut.partner.network.IchefzException;
+import com.playhut.partner.pullrefresh.ILoadingLayout;
+import com.playhut.partner.pullrefresh.PullToRefreshBase;
 import com.playhut.partner.pullrefresh.PullToRefreshListView;
 import com.playhut.partner.utils.DialogUtils;
+import com.playhut.partner.utils.PartnerUtils;
+import com.playhut.partner.utils.ToastUtils;
 import com.playhut.partner.widget.PartnerTitleBar;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  *
  */
-public class MessageDetailActivity extends BaseActivity {
+public class MessageDetailActivity extends BaseActivity implements PullToRefreshBase.OnRefreshListener<ListView> {
 
     private PullToRefreshListView mPullToRefreshListView;
 
@@ -39,6 +54,14 @@ public class MessageDetailActivity extends BaseActivity {
     private boolean mEditState = false;
 
     private Dialog mDeleteDialog;
+
+    public static final int PAGE_SIZE = 10;
+
+    private int mPage = 1; // 当前所处的页
+
+    private int mTotalPage = 1; // 总页数
+
+    public static final int SHOW_FOOTER_VIEW_LIMIT = 5; // 当所有item的总数小于这个数时，哪怕是最后一页也不显示footer view
 
     @Override
     protected void initView() {
@@ -80,7 +103,12 @@ public class MessageDetailActivity extends BaseActivity {
         mTitleBar.setRightTv1Listener(new PartnerTitleBar.TitleBarClickListener() {
             @Override
             public void onClick() {
-                toDeleteMsg();
+                int checkCount = getCheckCount();
+                if (checkCount > 0) {
+                    toDeleteMsg();
+                } else {
+                    ToastUtils.show("There is no selected message");
+                }
             }
         });
     }
@@ -92,6 +120,7 @@ public class MessageDetailActivity extends BaseActivity {
             mSenderId = intent.getStringExtra(SENDER_ID_INTENT);
         }
         mList = new ArrayList<>();
+        mPullToRefreshListView.setOnRefreshListener(this);
     }
 
     @Override
@@ -100,43 +129,101 @@ public class MessageDetailActivity extends BaseActivity {
         mAdapter = new MessageDetailAdapter(this, mList);
         mListView.setAdapter(mAdapter);
 
+        getMessageDetailList(true);
+    }
 
-        for (int i = 0; i < 6; i++) {
-            MessageDetailEntity.Message message = new MessageDetailEntity.Message();
+    @Override
+    public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
+        if (!PartnerUtils.checkNetwork(this)) {
+            mPullToRefreshListView.onPullDownRefreshComplete();
+            ToastUtils.show(NetworkConstants.NETWORK_ERROR_MSG);
+            return;
+        }
+        if (mPullToRefreshListView.mPullUpState == ILoadingLayout.State.REFRESHING) {
+            // 当前还处于自动加载更多中，则不能下拉刷新
+            mPullToRefreshListView.onPullDownRefreshComplete();
+            ToastUtils.show(getString(R.string.pull_to_refresh_loading));
+            return;
+        }
+        mPage = 1;
+        mTotalPage = 1;
+        getMessageDetailList(false);
+    }
 
-            if (i % 2 == 0) {
-                message.first_name = "Bingo";
-                message.last_name = "Zhang";
-                message.profile_picture = "drawable://" + R.mipmap.avatar_test;
-                message.time = "2016-10-10 15:38";
-                message.content = "Today is good day";
+    @Override
+    public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+        getMessageDetailList(false);
+    }
 
-                List<MessageDetailEntity.Child> childList = new ArrayList<>();
-                for (int j = 0; j < 2; j++) {
-                    MessageDetailEntity.Child child = new MessageDetailEntity.Child();
-                    child.first_name = "Duncan";
-                    child.last_name = "";
-                    child.profile_picture = "drawable://" + R.mipmap.test1;
-                    child.time = "2016-10-10 16:00";
-                    child.content = "Hi, My name is XX";
-                    childList.add(child);
+    private void getMessageDetailList(final boolean showLoadingView) {
+        IMessageDetailPresent present = new MessageDetailPresent(this, new MessageDetailView() {
+            @Override
+            public void startLoading() {
+                if (showLoadingView) {
+                    mPullToRefreshListView.mIchefzStateView.showLoadingView();
                 }
-
-                message.child = childList;
-            } else {
-                message.first_name = "Bingo";
-                message.last_name = "Zhang";
-                message.profile_picture = "drawable://" + R.mipmap.avatar_test;
-                message.time = "2016-10-10 15:38";
-                message.content = "Today is good day";
-
-                List<MessageDetailEntity.Child> childList = new ArrayList<>();
-                message.child = childList;
             }
 
-            mList.add(message);
-        }
-        mAdapter.notifyDataSetChanged();
+            @Override
+            public void loadSuccess(MessageDetailEntity entity) {
+                mPage++;
+                int total = entity.total;
+                if (total % PAGE_SIZE == 0) {
+                    mTotalPage = total / PAGE_SIZE;
+                } else {
+                    mTotalPage = (total / PAGE_SIZE) + 1;
+                }
+                mPullToRefreshListView.setScrollLoadEnabled(true);
+                if (mPage <= mTotalPage) {
+                    mPullToRefreshListView.setHasMoreData(true, true);
+                } else {
+                    if (total < SHOW_FOOTER_VIEW_LIMIT) {
+                        mPullToRefreshListView.setHasMoreData(false, false);
+                    } else {
+                        mPullToRefreshListView.setHasMoreData(false, true);
+                    }
+                }
+                if (mPage == 2) {
+                    mList.clear();
+                }
+                if (entity.message_list != null && entity.message_list.size() > 0) {
+                    mList.addAll(entity.message_list);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void finishLoading() {
+                mPullToRefreshListView.mIchefzStateView.dismissLoadingView();
+                mPullToRefreshListView.mIchefzStateView.dismissNetworkErrorView();
+                mPullToRefreshListView.mIchefzStateView.dismissLoadFailureView();
+                mPullToRefreshListView.mIchefzStateView.dismissNoItemView();
+
+                mPullToRefreshListView.setPullRefreshEnabled(true);
+                mPullToRefreshListView.onPullUpRefreshComplete();
+                mPullToRefreshListView.onPullDownRefreshComplete();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                if (mPage == 1) {
+                    if (mList.size() == 0) {
+                        // 第一次获取数据失败，并且原本没有数据，则显示错误和异常界面
+                        LoadFailureBusiness.loadFailure(MessageDetailActivity.this, exception, mPullToRefreshListView.mIchefzStateView, null);
+                    } else {
+                        // 第一次获取数据失败，但是原本有数据，则只显示吐司。例如第一次获取成功后，接着下拉刷新时获取失败
+                        ToastUtils.show(exception.getErrorMsg());
+                    }
+                } else {
+                    mPullToRefreshListView.setLoadException(exception);
+                }
+            }
+        });
+        present.getList(mSenderId, mPage, PAGE_SIZE);
+    }
+
+    public void doRefresh() {
+        mPullToRefreshListView.doPullRefreshing(true, 100);
     }
 
     private void setInEditMode() {
@@ -183,10 +270,90 @@ public class MessageDetailActivity extends BaseActivity {
         mDeleteDialog.findViewById(R.id.rl_confirm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 登录
+                // 删除
                 dismissDeleteDialog();
+                deleteMsg();
             }
         });
+    }
+
+    private void deleteMsg() {
+        String messageId = getMessageId();
+        IDeleteMsgPresent present = new DeleteMsgPresent(this, new DeleteMsgView() {
+            @Override
+            public void startLoading() {
+                showLoadingDialog(getString(R.string.loading_dialog_delete), true);
+            }
+
+            @Override
+            public void loadSuccess() {
+                mTitleBar.setRightTv2Content("Edit");
+                mTitleBar.setRightTv1Visiable(false);
+
+                Iterator<MessageDetailEntity.Message> it = mList.iterator();
+                while (it.hasNext()) {
+                    MessageDetailEntity.Message message = it.next();
+                    message.isShow = false;
+                    if (message.isCheck) {
+                        it.remove();
+                    }
+                    List<MessageDetailEntity.Child> childList = message.child;
+                    Iterator<MessageDetailEntity.Child> childIterator = childList.iterator();
+                    while (childIterator.hasNext()) {
+                        MessageDetailEntity.Child child = childIterator.next();
+                        if (child.isCheck) {
+                            childIterator.remove();
+                        }
+                    }
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void finishLoading() {
+                dismissLoadingDialog();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                ToastUtils.show(exception.getErrorMsg());
+            }
+        });
+        present.delete(messageId);
+    }
+
+    private int getCheckCount() {
+        int count = 0;
+        for (MessageDetailEntity.Message message : mList) {
+            if (message.isCheck)
+                count++;
+            List<MessageDetailEntity.Child> childList = message.child;
+            for (MessageDetailEntity.Child child : childList) {
+                if (child.isCheck)
+                    count++;
+            }
+        }
+        return count;
+    }
+
+    private String getMessageId() {
+        StringBuilder sb = new StringBuilder();
+        for (MessageDetailEntity.Message message : mList) {
+            if (message.isCheck) {
+                sb.append(message.message_id);
+                sb.append(",");
+            }
+            List<MessageDetailEntity.Child> childList = message.child;
+            for (MessageDetailEntity.Child child : childList) {
+                if (child.isCheck) {
+                    sb.append(child.message_id);
+                    sb.append(",");
+                }
+            }
+        }
+        String result = sb.toString();
+        result = result.substring(0, result.length() - 1);
+        return result;
     }
 
     private void dismissDeleteDialog() {

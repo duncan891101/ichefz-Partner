@@ -195,7 +195,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
-            android:text="Kitchen summery"
+            android:text="Kitchen summary"
             android:textColor="#333333"
             android:textSize="15dp" />
 

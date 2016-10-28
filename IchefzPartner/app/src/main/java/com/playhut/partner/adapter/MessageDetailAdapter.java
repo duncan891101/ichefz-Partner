@@ -2,9 +2,11 @@ package com.playhut.partner.adapter;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,10 +19,18 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.playhut.partner.R;
+import com.playhut.partner.activity.MessageDetailActivity;
+import com.playhut.partner.base.BaseActivity;
+import com.playhut.partner.base.PartnerApplication;
 import com.playhut.partner.entity.MessageDetailEntity;
+import com.playhut.partner.mvp.presenter.IReplyPresent;
+import com.playhut.partner.mvp.presenter.impl.ReplyPresent;
+import com.playhut.partner.mvp.view.ReplyView;
+import com.playhut.partner.network.IchefzException;
 import com.playhut.partner.ui.MessageDetailChildView;
 import com.playhut.partner.utils.DialogUtils;
 import com.playhut.partner.utils.ImageLoderOptionUtils;
+import com.playhut.partner.utils.ToastUtils;
 
 import java.util.List;
 
@@ -37,7 +47,7 @@ public class MessageDetailAdapter extends BaseAdapter {
 
     private DisplayImageOptions mOptions;
 
-    private Dialog mSendMsgDialog;
+    private Dialog mReplyDialog;
 
     public MessageDetailAdapter(Context context, List<MessageDetailEntity.Message> list) {
         this.mContext = context;
@@ -99,6 +109,13 @@ public class MessageDetailAdapter extends BaseAdapter {
         replyClickListener.setPosition(position);
 
         MessageDetailEntity.Message entity = mList.get(position);
+
+        if (entity.sender_id.equals("0")) {
+            // 系统消息
+            holder.mReplyTv.setVisibility(View.GONE);
+        } else {
+            holder.mReplyTv.setVisibility(View.VISIBLE);
+        }
 
         holder.mAllCb.setVisibility(entity.isShow ? View.VISIBLE : View.GONE);
         holder.mAllCb.setChecked(entity.isCheck);
@@ -192,25 +209,87 @@ public class MessageDetailAdapter extends BaseAdapter {
 
         private int mPosition;
 
-        public void setPosition(int position){
+        public void setPosition(int position) {
             mPosition = position;
         }
 
         @Override
         public void onClick(View v) {
-            showReplyDialog();
+            showReplyDialog(mPosition);
         }
 
     }
 
-    private void showReplyDialog() {
-        if (mSendMsgDialog == null || !mSendMsgDialog.isShowing()) {
-            mSendMsgDialog = DialogUtils.showSendMessageDialog(mContext, R.layout.message_reply_dialog_layout, true, false);
+    private void showReplyDialog(final int position) {
+        if (mReplyDialog == null || !mReplyDialog.isShowing()) {
+            mReplyDialog = DialogUtils.showRelayDialog(mContext, R.layout.reply_dialog_layout, true, true);
         }
-        final ImageView imageView = (ImageView) mSendMsgDialog.findViewById(R.id.iv_avatar);
-        final TextView msgTv = (TextView) mSendMsgDialog.findViewById(R.id.tv_name);
-        final EditText msgEt = (EditText) mSendMsgDialog.findViewById(R.id.et_msg);
-        Button sendBtn = (Button) mSendMsgDialog.findViewById(R.id.btn_send);
+
+        final EditText replyEt = (EditText) mReplyDialog.findViewById(R.id.et_reply);
+        replyEt.setFocusable(true);
+        replyEt.requestFocus();
+
+        mReplyDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(replyEt, 0);
+            }
+        });
+
+        mReplyDialog.show();
+
+        final Button reply = (Button) mReplyDialog.findViewById(R.id.btn_reply);
+        reply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismissReplyDialog();
+                String inputText = replyEt.getText().toString().trim();
+                if (!TextUtils.isEmpty(inputText)) {
+                    String senderId = PartnerApplication.mAccount.getChef_id();
+                    String parentId = mList.get(position).message_id;
+                    toReply(senderId, inputText, parentId);
+                } else {
+                    ToastUtils.show("Input text cannot be empty");
+                }
+            }
+        });
+    }
+
+    private void dismissReplyDialog() {
+        if (mReplyDialog != null && mReplyDialog.isShowing()) {
+            mReplyDialog.dismiss();
+            mReplyDialog = null;
+        }
+    }
+
+    private void toReply(String senderId, String content, String parentId) {
+        IReplyPresent present = new ReplyPresent(mContext, new ReplyView() {
+            @Override
+            public void startLoading() {
+                BaseActivity activity = (BaseActivity) mContext;
+                activity.showLoadingDialog(mContext.getString(R.string.loading_dialog_loading), true);
+            }
+
+            @Override
+            public void loadSuccess() {
+                ToastUtils.show("Send message successfully");
+                MessageDetailActivity activity = (MessageDetailActivity) mContext;
+                activity.doRefresh();
+            }
+
+            @Override
+            public void finishLoading() {
+                BaseActivity activity = (BaseActivity) mContext;
+                activity.dismissLoadingDialog();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                ToastUtils.show(exception.getErrorMsg());
+            }
+        });
+        present.reply(senderId, content, parentId);
     }
 
     static class Holder {

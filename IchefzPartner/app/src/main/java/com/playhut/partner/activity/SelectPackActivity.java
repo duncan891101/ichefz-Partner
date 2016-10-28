@@ -9,9 +9,16 @@ import android.view.View;
 import com.playhut.partner.R;
 import com.playhut.partner.adapter.SelectPackAdapter;
 import com.playhut.partner.base.BaseActivity;
+import com.playhut.partner.business.LoadFailureBusiness;
+import com.playhut.partner.constants.NetworkConstants;
 import com.playhut.partner.entity.SelectPackEntity;
+import com.playhut.partner.mvp.presenter.ISelectPackPresent;
+import com.playhut.partner.mvp.presenter.impl.SelectPackPresent;
+import com.playhut.partner.mvp.view.SelectPackView;
+import com.playhut.partner.network.IchefzException;
 import com.playhut.partner.recyclerview.IRecyclerViewItemClick;
 import com.playhut.partner.recyclerview.SelectPackItemDe;
+import com.playhut.partner.ui.IchefzStateView;
 import com.playhut.partner.utils.PartnerUtils;
 import com.playhut.partner.utils.ToastUtils;
 import com.playhut.partner.widget.PartnerTitleBar;
@@ -43,10 +50,13 @@ public class SelectPackActivity extends BaseActivity implements IRecyclerViewIte
 
     private ArrayList<String> mSelectIdList;
 
+    private IchefzStateView mIchefzStateView;
+
     @Override
     protected void initView() {
         setContentView(R.layout.activity_select_pack);
         mSelectPackRv = (RecyclerView) findViewById(R.id.rv_select_pack);
+        mIchefzStateView = (IchefzStateView) findViewById(R.id.state_view);
     }
 
     @Override
@@ -90,48 +100,67 @@ public class SelectPackActivity extends BaseActivity implements IRecyclerViewIte
         mAdapter.setRecyclerViewItemClick(this);
         mSelectPackRv.setAdapter(mAdapter);
 
-        for (int i = 0; i < 7; i++) {
-            SelectPackEntity.Packs packs = new SelectPackEntity.Packs();
-            packs.pack_id = String.valueOf(i + 2);
-            if (i % 2 == 0) {
-                packs.img = "drawable://" + R.mipmap.test1;
-            } else {
-                packs.img = "drawable://" + R.mipmap.avatar_test;
-            }
-            packs.title = "Burgers & Oven fries";
-            if (mSelectIdList != null && mSelectIdList.size() > 0) {
-                if (mSelectIdList.contains(packs.pack_id)) {
-                    packs.isCheck = true;
-                } else {
-                    packs.isCheck = false;
-                }
-            } else {
-                packs.isCheck = false;
-            }
-            mList.add(packs);
-        }
-        mAdapter.notifyDataSetChanged();
+        getList();
+    }
 
-        setOkBtnState();
+    private void getList(){
+        ISelectPackPresent present = new SelectPackPresent(this, new SelectPackView() {
+            @Override
+            public void startLoading() {
+                mIchefzStateView.showLoadingView();
+            }
+
+            @Override
+            public void loadSuccess(SelectPackEntity entity) {
+                List<SelectPackEntity.Packs> list = entity.packs;
+                mList.clear();
+                if (list != null && list.size() > 0){
+                    mList.addAll(list);
+                } else {
+                    mIchefzStateView.showNoItemView("No pack can select");
+                }
+                for (SelectPackEntity.Packs packs: mList){
+                    if (mSelectIdList != null && mSelectIdList.contains(packs.pack_id)){
+                        packs.isCheck = true;
+                    } else {
+                        packs.isCheck = false;
+                    }
+                }
+                mAdapter.notifyDataSetChanged();
+                setOkBtnState();
+            }
+
+            @Override
+            public void finishLoading() {
+                mIchefzStateView.dismissLoadingView();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                LoadFailureBusiness.loadFailure(SelectPackActivity.this, exception, mIchefzStateView, new SelectPackReloadListener());
+            }
+        });
+        present.getList();
+    }
+
+    private class SelectPackReloadListener implements LoadFailureBusiness.ReloadListener {
+        @Override
+        public void onReload() {
+            getList();
+        }
     }
 
     @Override
     public void onItemClick(View v, int position) {
-        // 必须选择4个
+        // 必须选择大于等于4个
         SelectPackEntity.Packs packs = mList.get(position);
         packs.isCheck = !packs.isCheck;
-        int checkCount = getCheckCount();
-        if (checkCount > 4) {
-            packs.isCheck = false;
-            ToastUtils.show(getString(R.string.select_pack_must_4));
-        }
         mAdapter.notifyItemChanged(position);
-
         setOkBtnState();
     }
 
     private void setOkBtnState(){
-        if (getCheckCount() == 4) {
+        if (getCheckCount() >= 4) {
             titleBar.setRightTv2Visiable(true);
         } else {
             titleBar.setRightTv2Visiable(false);

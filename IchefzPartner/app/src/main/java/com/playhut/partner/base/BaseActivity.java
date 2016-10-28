@@ -11,9 +11,13 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.playhut.partner.R;
+import com.playhut.partner.activity.LoginActivity;
+import com.playhut.partner.activity.MainActivity;
 import com.playhut.partner.utils.AccountUtils;
 import com.playhut.partner.utils.DialogUtils;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Activity基类
@@ -109,6 +113,9 @@ public abstract class BaseActivity extends RxAppCompatActivity {
             public void onClick(View v) {
                 // 取消
                 dismissOutDateDialog();
+                startActivity(new Intent(BaseActivity.this, MainActivity.class));
+                startActivity(new Intent(BaseActivity.this, LoginActivity.class));
+                EventBus.getDefault().post(MainActivity.FINISH_MAIN_EVENT_BUS_TAG);
             }
         });
         mOutDateDialog.findViewById(R.id.rl_confirm).setOnClickListener(new View.OnClickListener() {
@@ -116,6 +123,9 @@ public abstract class BaseActivity extends RxAppCompatActivity {
             public void onClick(View v) {
                 // 登录
                 dismissOutDateDialog();
+                startActivity(new Intent(BaseActivity.this, MainActivity.class));
+                startActivity(new Intent(BaseActivity.this, LoginActivity.class));
+                EventBus.getDefault().post(MainActivity.FINISH_MAIN_EVENT_BUS_TAG);
             }
         });
     }

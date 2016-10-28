@@ -40,7 +40,12 @@ public class AddSetAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mImageUrlList.size();
+        int count = mImageUrlList.size();
+        if (count > 0) {
+            return 4;
+        } else {
+            return 0;
+        }
     }
 
     @Override

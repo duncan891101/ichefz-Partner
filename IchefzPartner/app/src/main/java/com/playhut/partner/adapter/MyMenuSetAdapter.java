@@ -1,6 +1,8 @@
 package com.playhut.partner.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -14,11 +16,22 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.playhut.partner.R;
+import com.playhut.partner.activity.LoginActivity;
+import com.playhut.partner.activity.MainActivity;
+import com.playhut.partner.base.BaseActivity;
 import com.playhut.partner.constants.PackState;
 import com.playhut.partner.entity.MyMenuSetEntity;
+import com.playhut.partner.mvp.presenter.IDeleteMenuPresent;
+import com.playhut.partner.mvp.presenter.impl.DeleteMenuPresent;
+import com.playhut.partner.mvp.view.DeleteMenuView;
+import com.playhut.partner.network.IchefzException;
+import com.playhut.partner.utils.DialogUtils;
+import com.playhut.partner.utils.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  *
@@ -28,6 +41,10 @@ public class MyMenuSetAdapter extends BaseAdapter {
     private Context mContext;
 
     private List<MyMenuSetEntity.SetInfo> mList;
+
+    private Dialog mConfirmDialog;
+
+    private DeleteSuccessListener mDeleteSuccessListener;
 
     public MyMenuSetAdapter(Context context, List<MyMenuSetEntity.SetInfo> list) {
         this.mContext = context;
@@ -53,6 +70,7 @@ public class MyMenuSetAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder = null;
         ExpandClickListener expandClickListener = null;
+        DeleteListener deleteListener = null;
         if (convertView == null) {
             convertView = View.inflate(mContext, R.layout.my_menu_set_item_layout, null);
             holder = new Holder();
@@ -78,7 +96,11 @@ public class MyMenuSetAdapter extends BaseAdapter {
             holder.mArrowIv.setOnClickListener(expandClickListener);
 
             holder.mHintLayout = (LinearLayout) convertView.findViewById(R.id.ll_hint_layout);
+
             holder.mDeleteBtn = (Button) convertView.findViewById(R.id.btn_delete);
+            deleteListener = new DeleteListener();
+            holder.mDeleteBtn.setOnClickListener(deleteListener);
+
             holder.mEditBtn = (Button) convertView.findViewById(R.id.btn_edit);
             holder.mStateCb = (CheckBox) convertView.findViewById(R.id.cb_state);
             holder.mEditLayout = (RelativeLayout) convertView.findViewById(R.id.rl_edit);
@@ -88,12 +110,15 @@ public class MyMenuSetAdapter extends BaseAdapter {
 
             convertView.setTag(holder);
             convertView.setTag(holder.mArrowIv.getId(), expandClickListener);
+            convertView.setTag(holder.mDeleteBtn.getId(), deleteListener);
         } else {
             holder = (Holder) convertView.getTag();
             expandClickListener = (ExpandClickListener) convertView.getTag(holder.mArrowIv.getId());
+            deleteListener = (DeleteListener) convertView.getTag(holder.mDeleteBtn.getId());
         }
 
         expandClickListener.setPosition(position);
+        deleteListener.setPosition(position);
 
         MyMenuSetEntity.SetInfo setInfo = mList.get(position);
 
@@ -193,6 +218,92 @@ public class MyMenuSetAdapter extends BaseAdapter {
             notifyDataSetChanged();
         }
 
+    }
+
+    private class DeleteListener implements View.OnClickListener {
+
+        private int mPosition;
+
+        public void setPosition(int position) {
+            this.mPosition = position;
+        }
+
+        @Override
+        public void onClick(View v) {
+            showConfirmDialog(mPosition);
+        }
+    }
+
+    private void showConfirmDialog(final int position) {
+        if (mConfirmDialog == null || !mConfirmDialog.isShowing()) {
+            mConfirmDialog = DialogUtils.showConfirmDialog(mContext, R.layout.confirm_dialog_layout, true);
+        }
+        TextView titleTv = (TextView) mConfirmDialog.findViewById(R.id.tv_title);
+        titleTv.setText("Delete");
+        TextView textTv = (TextView) mConfirmDialog.findViewById(R.id.tv_text);
+        textTv.setText("Are you sure to delete the set menu?");
+        TextView confirmTv = (TextView) mConfirmDialog.findViewById(R.id.tv_confirm);
+        confirmTv.setText("Delete");
+        mConfirmDialog.findViewById(R.id.rl_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 取消
+                dismissConfirmDialog();
+            }
+        });
+        mConfirmDialog.findViewById(R.id.rl_confirm).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 登录
+                dismissConfirmDialog();
+                toDelete(position);
+            }
+        });
+    }
+
+    private void toDelete(final int position) {
+        String menuId = mList.get(position).set_id;
+        IDeleteMenuPresent present = new DeleteMenuPresent(mContext, new DeleteMenuView() {
+            @Override
+            public void startLoading() {
+                BaseActivity baseActivity = (BaseActivity) mContext;
+                baseActivity.showLoadingDialog(mContext.getString(R.string.loading_dialog_delete), true);
+            }
+
+            @Override
+            public void loadSuccess(String info) {
+                if (mDeleteSuccessListener != null){
+                    mDeleteSuccessListener.delete(info, position);
+                }
+            }
+
+            @Override
+            public void finishLoading() {
+                BaseActivity baseActivity = (BaseActivity) mContext;
+                baseActivity.dismissLoadingDialog();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                ToastUtils.show(exception.getErrorMsg());
+            }
+        });
+        present.delete(menuId, "set");
+    }
+
+    private void dismissConfirmDialog() {
+        if (mConfirmDialog != null && mConfirmDialog.isShowing()) {
+            mConfirmDialog.dismiss();
+            mConfirmDialog = null;
+        }
+    }
+
+    public interface DeleteSuccessListener {
+        void delete(String info, int position);
+    }
+
+    public void setDeleteSuccessListener(DeleteSuccessListener deleteSuccessListener){
+        this.mDeleteSuccessListener = deleteSuccessListener;
     }
 
     static class Holder {

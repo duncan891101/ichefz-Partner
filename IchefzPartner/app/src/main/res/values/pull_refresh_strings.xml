@@ -12,4 +12,5 @@
     <string name="pull_to_refresh_load_exception">Failed to load, please reload</string>
     <string name="pull_to_refresh_refreshing">Refreshing</string>
     <string name="pull_to_refresh_loading">Loading</string>
+    <string name="pull_to_refresh_more_data">More data</string>
 </resources>

@@ -552,12 +552,20 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         // 创建一个包装容器
         mRefreshableViewWrapper = new FrameLayout(context);
         mRefreshableViewWrapper.addView(refreshableView, width, height);
+        View stateView = getStateView(context);
+        if (stateView != null){
+            mRefreshableViewWrapper.addView(stateView);
+        }
 
         // 这里把Refresh view的高度设置为一个很小的值，它的高度最终会在onSizeChanged()方法中设置为MATCH_PARENT
         // 这样做的原因是，如果此是它的height是MATCH_PARENT，那么footer得到的高度就是0，所以，我们先设置高度很小
         // 我们就可以得到header和footer的正常高度，当onSizeChanged后，Refresh view的高度又会变为正常。
         height = 10;
         addView(mRefreshableViewWrapper, new LayoutParams(width, height));
+    }
+
+    protected View getStateView(Context context){
+        return null;
     }
 
     /**

@@ -11,17 +11,27 @@ import android.widget.ListView;
 import com.playhut.partner.R;
 import com.playhut.partner.activity.HistoryOrderActivity;
 import com.playhut.partner.adapter.NewOrderAdapter;
-import com.playhut.partner.constants.OrderState;
+import com.playhut.partner.business.LoadFailureBusiness;
 import com.playhut.partner.entity.NewOrderEntity;
+import com.playhut.partner.eventbus.RefundOrderEB;
+import com.playhut.partner.mvp.presenter.IHistoryOrderPresent;
+import com.playhut.partner.mvp.presenter.impl.HistoryOrderPresent;
+import com.playhut.partner.mvp.view.HistoryOrderView;
+import com.playhut.partner.network.IchefzException;
+import com.playhut.partner.pullrefresh.PullToRefreshBase;
 import com.playhut.partner.pullrefresh.PullToRefreshListView;
+import com.playhut.partner.utils.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
+
 /**
  *
  */
-public class HistoryOrderFragment extends Fragment {
+public class HistoryOrderFragment extends Fragment implements PullToRefreshBase.OnRefreshListener<ListView>{
 
     public static final String CURRENT_TAB_NAME = "mCurrentTab";
 
@@ -35,7 +45,7 @@ public class HistoryOrderFragment extends Fragment {
 
     private boolean mIsFragmentVisible = false;
 
-    private boolean mIsLoaded = false; //是否已加载过
+//    private boolean mIsLoaded = false; //是否已加载过
 
     private PullToRefreshListView mPullToRefreshListView;
 
@@ -44,6 +54,14 @@ public class HistoryOrderFragment extends Fragment {
     private List<NewOrderEntity.Order> mList;
 
     private NewOrderAdapter mAdapter;
+
+    public static final int PAGE_SIZE = 8;
+
+    private int mPage = 1; // 当前所处的页
+
+    private int mTotalPage = 1; // 总页数
+
+    public static final int SHOW_FOOTER_VIEW_LIMIT = 2; // 当所有item的总数小于这个数时，哪怕是最后一页也不显示footer view
 
     public static HistoryOrderFragment getInstance(int currentTab) {
         HistoryOrderFragment fragment = new HistoryOrderFragment();
@@ -60,6 +78,9 @@ public class HistoryOrderFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             mCurrentTab = bundle.getInt(CURRENT_TAB_NAME);
+            if (mCurrentTab == HistoryOrderActivity.CONFIRMED_TAB){
+                EventBus.getDefault().register(this);
+            }
         }
     }
 
@@ -92,109 +113,125 @@ public class HistoryOrderFragment extends Fragment {
     private void initView() {
         mPullToRefreshListView = (PullToRefreshListView) mRootView.findViewById(R.id.lv_pull_refresh);
         mListView = mPullToRefreshListView.getRefreshableView();
+        mPullToRefreshListView.setOnRefreshListener(this);
 
         mList = new ArrayList<>();
+        mListView.setDividerHeight(0);
+        mAdapter = new NewOrderAdapter(mContext, mList);
+        mListView.setAdapter(mAdapter);
     }
 
     private void loadData() {
-        if (!mIsPrepared || !mIsFragmentVisible || mIsLoaded) {
+        if (!mIsPrepared || !mIsFragmentVisible /*|| mIsLoaded*/) {
             return;
         }
-        mIsLoaded = true;
+//        mIsLoaded = true;
+        mPage = 1;
+        mTotalPage = 1;
+        toGetHistoryOrder(true);
+    }
 
-        mAdapter = new NewOrderAdapter(mContext, mList);
-        mListView.setAdapter(mAdapter);
+    @Override
+    public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
 
-        for (int i = 0; i < 8; i++) {
-            if (i % 2 == 0) {
-                testData2();
-            } else {
-                testData1();
+    }
+
+    @Override
+    public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+        toGetHistoryOrder(false);
+    }
+
+    private void toGetHistoryOrder(final boolean showLoadingView) {
+        IHistoryOrderPresent present = new HistoryOrderPresent(mContext, new HistoryOrderView() {
+            @Override
+            public void startLoading() {
+                if (showLoadingView) {
+                    mPullToRefreshListView.mIchefzStateView.showLoadingView();
+                }
+            }
+
+            @Override
+            public void loadSuccess(NewOrderEntity entity) {
+                mPage++;
+                int total = entity.total;
+                if (total % PAGE_SIZE == 0) {
+                    mTotalPage = total / PAGE_SIZE;
+                } else {
+                    mTotalPage = (total / PAGE_SIZE) + 1;
+                }
+                mPullToRefreshListView.setScrollLoadEnabled(true);
+                if (mPage <= mTotalPage) {
+                    mPullToRefreshListView.setHasMoreData(true, true);
+                } else {
+                    if (total < SHOW_FOOTER_VIEW_LIMIT) {
+                        mPullToRefreshListView.setHasMoreData(false, false);
+                    } else {
+                        mPullToRefreshListView.setHasMoreData(false, true);
+                    }
+                }
+                if (mPage == 2) {
+                    mList.clear();
+                }
+                if (entity.order_list != null && entity.order_list.size() > 0) {
+                    mList.addAll(entity.order_list);
+                } else {
+                    String noItem;
+                    if (mCurrentTab == HistoryOrderActivity.CONFIRMED_TAB) {
+                        noItem = "There is no confirm order";
+                    } else if (mCurrentTab == HistoryOrderActivity.FINISHED_TAB) {
+                        noItem = "There is no finished order";
+                    } else {
+                        noItem = "There is no refund order";
+                    }
+                    mPullToRefreshListView.mIchefzStateView.showNoItemView(noItem);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void finishLoading() {
+                mPullToRefreshListView.mIchefzStateView.dismissLoadingView();
+                mPullToRefreshListView.mIchefzStateView.dismissNetworkErrorView();
+                mPullToRefreshListView.mIchefzStateView.dismissLoadFailureView();
+                mPullToRefreshListView.mIchefzStateView.dismissNoItemView();
+
+                mPullToRefreshListView.onPullUpRefreshComplete();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                if (mPage == 1) {
+                    if (mList.size() == 0) {
+                        // 第一次获取数据失败，并且原本没有数据，则显示错误和异常界面
+                        LoadFailureBusiness.loadFailure(mContext, exception, mPullToRefreshListView.mIchefzStateView, null);
+                    } else {
+                        // 第一次获取数据失败，但是原本有数据，则只显示吐司。例如第一次获取成功后，接着下拉刷新时获取失败
+                        ToastUtils.show(exception.getErrorMsg());
+                    }
+                } else {
+                    mPullToRefreshListView.setLoadException(exception);
+                }
+            }
+        });
+        present.getList(String.valueOf(mCurrentTab), mPage, PAGE_SIZE);
+    }
+
+    @Subscribe
+    public void onEventMainThread(RefundOrderEB refundOrderEB) {
+        if (refundOrderEB != null && mCurrentTab == HistoryOrderActivity.CONFIRMED_TAB) {
+            mList.remove(refundOrderEB.position);
+            mAdapter.notifyDataSetChanged();
+            if (mList.size() == 0){
+                mPullToRefreshListView.mIchefzStateView.showNoItemView("There is no confirm order");
             }
         }
-        mAdapter.notifyDataSetChanged();
     }
 
-    private void testData1() {
-        NewOrderEntity.Order order = new NewOrderEntity.Order();
-        order.order_number = "25873491643";
-        order.time = "2016/09/29 13:34AM";
-        order.customer_first_name = "Bingo";
-        order.customer_last_name = "Zhang";
-        order.customer_number = "987-020-1354";
-        order.customer_address = "aaa bbc eeffa jiiwk hhexx";
-        order.subtotal = "25.20";
+    @Override
+    public void onDestroy() {
         if (mCurrentTab == HistoryOrderActivity.CONFIRMED_TAB){
-            order.order_state = OrderState.PAID_WAIT_RECEIPT;
-        } else if (mCurrentTab == HistoryOrderActivity.FINISHED_TAB){
-            order.order_state = OrderState.FINISHED;
-        } else {
-            order.order_state = OrderState.REFUND_SUCCESS;
+            EventBus.getDefault().unregister(this);
         }
-        List<NewOrderEntity.OrderItem> list = new ArrayList<>();
-        NewOrderEntity.OrderItem item1 = new NewOrderEntity.OrderItem();
-        List<String> urlList = new ArrayList<>();
-        urlList.add("drawable://" + R.mipmap.test1);
-        item1.picture = urlList;
-        item1.mtype = "list";
-        item1.item_price = "15.02";
-        item1.person = "2";
-        item1.quantity = "1";
-        item1.title = "Steak and shrimp";
-        list.add(item1);
-        order.order_items = list;
-
-        mList.add(order);
+        super.onDestroy();
     }
-
-    private void testData2() {
-        NewOrderEntity.Order order = new NewOrderEntity.Order();
-        order.order_number = "25873491643";
-        order.time = "2016/09/29 13:34AM";
-        order.customer_first_name = "Bingo";
-        order.customer_last_name = "Zhang";
-        order.customer_number = "987-020-1354";
-        order.customer_address = "aaa bbc eeffa jiiwk hhexx";
-        order.subtotal = "25.20";
-        if (mCurrentTab == HistoryOrderActivity.CONFIRMED_TAB){
-            order.order_state = OrderState.PAID_WAIT_RECEIPT;
-        } else if (mCurrentTab == HistoryOrderActivity.FINISHED_TAB){
-            order.order_state = OrderState.FINISHED;
-        } else {
-            order.order_state = OrderState.APPLY_REFUND;
-            order.chef_handle = 1;
-        }
-        order.remark = "many rice xiie eowjow weoowgw woejowjw weowwe wefwfw wefwefwfwf";
-        List<NewOrderEntity.OrderItem> list = new ArrayList<>();
-
-        NewOrderEntity.OrderItem item1 = new NewOrderEntity.OrderItem();
-        List<String> urlList = new ArrayList<>();
-        urlList.add("drawable://" + R.mipmap.test1);
-        item1.picture = urlList;
-        item1.mtype = "list";
-        item1.item_price = "15.02";
-        item1.person = "2";
-        item1.quantity = "1";
-        item1.title = "Steak and shrimp";
-        list.add(item1);
-
-        NewOrderEntity.OrderItem item2 = new NewOrderEntity.OrderItem();
-        List<String> urlList2 = new ArrayList<>();
-        urlList2.add("drawable://" + R.mipmap.test1);
-        urlList2.add("drawable://" + R.mipmap.test1);
-        urlList2.add("drawable://" + R.mipmap.test1);
-        urlList2.add("drawable://" + R.mipmap.test1);
-        item2.picture = urlList2;
-        item2.mtype = "set";
-        item2.item_price = "15.02";
-        item2.person = "2";
-        item2.quantity = "3";
-        item2.title = "Crispy catfish";
-        list.add(item2);
-
-        order.order_items = list;
-
-        mList.add(order);
-    }
-
 }

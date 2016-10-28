@@ -17,6 +17,7 @@ import com.playhut.partner.R;
 import com.playhut.partner.adapter.MainGridViewAdapter;
 import com.playhut.partner.base.BaseActivity;
 import com.playhut.partner.constants.GlobalConstants;
+import com.playhut.partner.debug.MyLog;
 import com.playhut.partner.entity.MainInfoEntity;
 import com.playhut.partner.mvp.presenter.IMainInfoPresent;
 import com.playhut.partner.mvp.presenter.IMainOpenStatePresent;
@@ -166,7 +167,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        MyLog.i("======onCheckedChanged======");
         if (buttonView.isPressed()) {
+            MyLog.i("======press======");
             int state = isChecked ? 1 : 0;
             IMainOpenStatePresent present = new MainOpenStatePresent(MainActivity.this, new MainOpenStateListener());
             present.setOpenState(state);

@@ -17,9 +17,19 @@ public class FieldMapManager {
      * 获取包含所有(公共和特定)请求参数Map
      *
      * @param privateMap，如果该接口没有特定参数，则传null
-     * @return
      */
     public static Map<String, String> getFieldMap(Map<String, String> privateMap) {
+        return getMap(privateMap, false);
+    }
+
+    /**
+     * loginWithoutChefId，如果登录后该接口不需要用chef_id，那么这个参数就true
+     */
+    public static Map<String, String> getFieldMap(Map<String, String> privateMap, boolean loginWithoutChefId) {
+        return getMap(privateMap, loginWithoutChefId);
+    }
+
+    private static Map<String, String> getMap(Map<String, String> privateMap, boolean loginWithoutChefId) {
         Map<String, String> fieldMap = new TreeMap<>();
         if (privateMap != null) {
             Set<String> keys = privateMap.keySet();
@@ -28,7 +38,7 @@ public class FieldMapManager {
                 fieldMap.put(key, value);
             }
         }
-        putPublicParamsToFieldMap(fieldMap);
+        putPublicParamsToFieldMap(fieldMap, loginWithoutChefId);
         putSignParamsToFieldMap(fieldMap);
         logFieldMap(fieldMap);
 
@@ -41,14 +51,16 @@ public class FieldMapManager {
      * @param fieldMap
      * @return
      */
-    private static void putPublicParamsToFieldMap(Map<String, String> fieldMap) {
+    private static void putPublicParamsToFieldMap(Map<String, String> fieldMap, boolean loginWithoutChefId) {
         fieldMap.put(NetworkConstants.API_VERSION_NAME, NetworkConstants.API_VERSION_VALUE);
         fieldMap.put(NetworkConstants.TIME_STAMP_NAME, String.valueOf(System.currentTimeMillis()));
         fieldMap.put(NetworkConstants.CLIENT_TYPE_NAME, NetworkConstants.CLIENT_TYPE_VALUE);
         if (PartnerApplication.mAccount != null && PartnerApplication.mAccount.isAccountValid()) {
             // 用户已登录，已登录用户则需要传递Token
             fieldMap.put(NetworkConstants.API_TOKEN_NAME, PartnerApplication.mAccount.getApi_token());
-            fieldMap.put("chef_id", PartnerApplication.mAccount.getChef_id());
+            if (!loginWithoutChefId) {
+                fieldMap.put("chef_id", PartnerApplication.mAccount.getChef_id());
+            }
         }
     }
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -12,7 +11,8 @@ import android.widget.RelativeLayout;
 
 import com.playhut.partner.R;
 import com.playhut.partner.constants.GlobalConstants;
-import com.playhut.partner.debug.MyLog;
+
+import java.io.File;
 
 /**
  *
@@ -27,7 +27,13 @@ public class AddTipsItemView extends LinearLayout {
 
     private EditText mDescEt;
 
+    private File mFile;
+
     private AddTipDeleteListener mAddTipDeleteListener;
+
+    private AddTipClickListener mAddTipClickListener;
+
+    private int mId;
 
     public AddTipsItemView(Context context) {
         super(context);
@@ -44,13 +50,16 @@ public class AddTipsItemView extends LinearLayout {
         init(context);
     }
 
-    private void init(Context context) {
+    private void init(final Context context) {
         View.inflate(context, R.layout.add_tips_item_layout, this);
+
+        final int width = GlobalConstants.SCREEN_WIDTH;
+        final int height = (int) (width * 0.6f);
 
         RelativeLayout imageLayout = (RelativeLayout) findViewById(R.id.rl_img);
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) imageLayout.getLayoutParams();
-        params.width = GlobalConstants.SCREEN_WIDTH;
-        params.height = GlobalConstants.SCREEN_WIDTH / 2;
+        params.width = width;
+        params.height = height;
         imageLayout.setLayoutParams(params);
 
         mImageView = (ImageView) findViewById(R.id.iv_img);
@@ -66,10 +75,40 @@ public class AddTipsItemView extends LinearLayout {
                 }
             }
         });
+        mImageView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 更换别的图片
+                if (mAddTipClickListener != null) {
+                    mAddTipClickListener.onClick(AddTipsItemView.this);
+                }
+            }
+        });
     }
 
-    public void setImageView(Bitmap bitmap) {
+    public void setImageView(Bitmap bitmap, File file) {
+        this.mFile = file;
         mImageView.setImageBitmap(bitmap);
+    }
+
+    public void setId(int id){
+        this.mId = id;
+    }
+
+    public int getId(){
+        return mId;
+    }
+
+    public File getImageFile() {
+        return mFile;
+    }
+
+    public String getTitle() {
+        return mTitleEt.getText().toString().trim();
+    }
+
+    public String getDesc() {
+        return mDescEt.getText().toString().trim();
     }
 
     public void setAddTipDeleteListener(AddTipDeleteListener addTipDeleteListener) {
@@ -78,6 +117,14 @@ public class AddTipsItemView extends LinearLayout {
 
     public interface AddTipDeleteListener {
         void onDelete(LinearLayout item);
+    }
+
+    public interface AddTipClickListener {
+        void onClick(AddTipsItemView addTipsItemView);
+    }
+
+    public void setAddTipClickListener(AddTipClickListener addTipClickListener) {
+        this.mAddTipClickListener = addTipClickListener;
     }
 
 }

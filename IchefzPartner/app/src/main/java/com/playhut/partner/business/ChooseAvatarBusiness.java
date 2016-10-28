@@ -18,7 +18,6 @@ import com.playhut.partner.utils.FileUtils;
 import com.playhut.partner.utils.ToastUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
  *
@@ -31,11 +30,11 @@ public class ChooseAvatarBusiness {
 
     private BaseActivity mBaseActivity;
 
-    public static final int ALBUM_REQUEST_CODE = 14344;
+    private int ALBUM_REQUEST_CODE = 15896;
 
-    public static final int TAKE_PHOTO_REQUEST_CODE = 12446;
+    private int TAKE_PHOTO_REQUEST_CODE = 29541;
 
-    public static final int CROP_REQUEST_CODE = 15634;
+    private int CROP_REQUEST_CODE = 33550;
 
     private int mCropImageWidth;
 
@@ -59,6 +58,18 @@ public class ChooseAvatarBusiness {
         this.mContext = context;
         this.mCropImageWidth = cropImageWidth;
         this.mCropImageHeight = cropImageHeight;
+        mBaseActivity = (BaseActivity) mContext;
+        mAvatarRootFile = FileUtils.getAvatarCachePath(context);
+    }
+
+    public ChooseAvatarBusiness(Context context, int cropImageWidth, int cropImageHeight, int albumRequestCode, int takePhoteRequestCode,
+                                int cropRequestCode) {
+        this.mContext = context;
+        this.mCropImageWidth = cropImageWidth;
+        this.mCropImageHeight = cropImageHeight;
+        this.ALBUM_REQUEST_CODE = albumRequestCode;
+        this.TAKE_PHOTO_REQUEST_CODE = takePhoteRequestCode;
+        this.CROP_REQUEST_CODE = cropRequestCode;
         mBaseActivity = (BaseActivity) mContext;
         mAvatarRootFile = FileUtils.getAvatarCachePath(context);
     }
@@ -109,43 +120,39 @@ public class ChooseAvatarBusiness {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case ALBUM_REQUEST_CODE:
-                // 相册选择
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    Uri cropUri = data.getData();
-                    if (cropUri != null) {
-                        initToCrop(cropUri);
-                    } else {
-                        ToastUtils.show(mContext.getString(R.string.upload_avatar_get_pic_fail));
-                    }
+        if (requestCode == ALBUM_REQUEST_CODE){
+            // 相册选择
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                Uri cropUri = data.getData();
+                if (cropUri != null) {
+                    initToCrop(cropUri);
                 } else {
                     ToastUtils.show(mContext.getString(R.string.upload_avatar_get_pic_fail));
                 }
-                break;
-            case CROP_REQUEST_CODE:
-                // 裁剪后回调
-                if (resultCode == Activity.RESULT_OK && mSaveFile != null) {
-                    Bitmap bitmap = BitmapUtils.getBitmapFromFilePath(mSaveFile, mCropImageWidth * mCropImageHeight);
-                    if (bitmap != null) {
-                        if (mUserSelectAvatarListener != null) {
-                            mUserSelectAvatarListener.select(bitmap, mSaveFile);
-                        }
-                    } else {
-                        ToastUtils.show(mContext.getString(R.string.upload_avatar_crop_pic_fail));
+            } else {
+                ToastUtils.show(mContext.getString(R.string.upload_avatar_get_pic_fail));
+            }
+        } else if (requestCode == CROP_REQUEST_CODE){
+            // 裁剪后回调
+            if (resultCode == Activity.RESULT_OK && mSaveFile != null) {
+                Bitmap bitmap = BitmapUtils.getBitmapFromFilePath(mSaveFile, mCropImageWidth * mCropImageHeight);
+                if (bitmap != null) {
+                    if (mUserSelectAvatarListener != null) {
+                        mUserSelectAvatarListener.select(bitmap, mSaveFile);
                     }
                 } else {
                     ToastUtils.show(mContext.getString(R.string.upload_avatar_crop_pic_fail));
                 }
-                break;
-            case TAKE_PHOTO_REQUEST_CODE:
-                // 拍照上传
-                if (resultCode == Activity.RESULT_OK) {
-                    initToCrop(mTakePhotoUri);
-                } else {
-                    ToastUtils.show(mContext.getString(R.string.upload_avatar_get_pic_fail));
-                }
-                break;
+            } else {
+                ToastUtils.show(mContext.getString(R.string.upload_avatar_crop_pic_fail));
+            }
+        } else if (requestCode == TAKE_PHOTO_REQUEST_CODE){
+            // 拍照上传
+            if (resultCode == Activity.RESULT_OK) {
+                initToCrop(mTakePhotoUri);
+            } else {
+                ToastUtils.show(mContext.getString(R.string.upload_avatar_get_pic_fail));
+            }
         }
     }
 
@@ -163,8 +170,8 @@ public class ChooseAvatarBusiness {
         intent.putExtra("crop", "true");
 
         // aspectX aspectY 是宽高的比例
-        intent.putExtra("aspectX", mCropImageWidth / mCropImageHeight);
-        intent.putExtra("aspectY", 1);
+        intent.putExtra("aspectX", mCropImageWidth);
+        intent.putExtra("aspectY", mCropImageHeight);
 
         // outputX,outputY 是剪裁图片的宽高
         intent.putExtra("outputX", mCropImageWidth);

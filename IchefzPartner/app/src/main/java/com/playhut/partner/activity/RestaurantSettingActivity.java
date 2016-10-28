@@ -270,7 +270,7 @@ public class RestaurantSettingActivity extends BaseActivity implements View.OnCl
                 KitchenAddressActivity.actionIntent(this, mRestaurantEntity);
                 break;
             case R.id.rl_bank_info:
-                startActivity(new Intent(this, BankInformationActivity.class));
+                BankInformationActivity.actionIntent(this, mRestaurantEntity);
                 break;
             case R.id.rl_about_me:
                 Intent aboutMeIntent = new Intent(this, AboutMeActivity.class);

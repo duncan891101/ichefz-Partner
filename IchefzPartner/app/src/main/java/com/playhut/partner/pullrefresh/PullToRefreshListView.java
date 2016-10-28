@@ -8,8 +8,13 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.Adapter;
 import android.widget.ListView;
 
+import com.playhut.partner.R;
+import com.playhut.partner.constants.NetworkConstants;
+import com.playhut.partner.network.IchefzException;
 import com.playhut.partner.pullrefresh.ILoadingLayout.State;
+import com.playhut.partner.ui.IchefzStateView;
 import com.playhut.partner.utils.PartnerUtils;
+import com.playhut.partner.utils.ToastUtils;
 
 /**
  * 这个类实现了ListView下拉刷新，上加载更多和滑到底部自动加载
@@ -30,6 +35,8 @@ public class PullToRefreshListView extends PullToRefreshBase<ListView> implement
     private OnScrollListener mScrollListener;
 
     private Context mContext;
+
+    public IchefzStateView mIchefzStateView;
 
     /**
      * 构造方法
@@ -73,15 +80,23 @@ public class PullToRefreshListView extends PullToRefreshBase<ListView> implement
         return listView;
     }
 
+    @Override
+    protected View getStateView(Context context) {
+        View stateViewContent = View.inflate(context, R.layout.state_view_content_layout, null);
+        mIchefzStateView = (IchefzStateView) stateViewContent.findViewById(R.id.state_view);
+        return stateViewContent;
+    }
+
     /**
      * 设置是否有更多数据的标志
      *
-     * @param hasMoreData   true表示还有更多的数据，false表示没有更多数据了
+     * @param hasMoreData true表示还有更多的数据，false表示没有更多数据了
      */
-    public void setHasMoreData(boolean hasMoreData) {
+    public void setHasMoreData(boolean hasMoreData, boolean showFooterView) {
         if (!hasMoreData) {
             if (null != mLoadMoreFooterLayout) {
                 mLoadMoreFooterLayout.setState(State.NO_MORE_DATA);
+                mLoadMoreFooterLayout.show(showFooterView);
             }
         } else {
             mLoadMoreFooterLayout.setState(State.RESET);
@@ -93,6 +108,7 @@ public class PullToRefreshListView extends PullToRefreshBase<ListView> implement
      */
     public void setNetWorkError() {
         if (null != mLoadMoreFooterLayout) {
+            ToastUtils.show(NetworkConstants.NETWORK_ERROR_MSG);
             mLoadMoreFooterLayout.setState(State.NET_WORK_ERROR);
         }
     }
@@ -100,8 +116,9 @@ public class PullToRefreshListView extends PullToRefreshBase<ListView> implement
     /**
      * 设置加载异常的显示
      */
-    public void setLoadException() {
+    public void setLoadException(IchefzException exception) {
         if (null != mLoadMoreFooterLayout) {
+            ToastUtils.show(exception.getErrorMsg());
             mLoadMoreFooterLayout.setState(State.LOAD_EXCEPTION);
         }
     }
@@ -171,10 +188,16 @@ public class PullToRefreshListView extends PullToRefreshBase<ListView> implement
         if (isScrollLoadEnabled() && hasMoreData()) {
             if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
                 if (isReadyForPullUp()) {
-                    if (PartnerUtils.checkNetwork(mContext)) {
-                        startLoading();
+                    if (mPullDownState != State.REFRESHING) {
+                        // 不处于下拉刷新状态中，才能加载更多
+                        if (PartnerUtils.checkNetwork(mContext)) {
+                            startLoading();
+                        } else {
+                            setNetWorkError();
+                        }
                     } else {
-                        setNetWorkError();
+                        onPullUpRefreshComplete();
+                        ToastUtils.show(mContext.getString(R.string.pull_to_refresh_refreshing));
                     }
                 }
             }

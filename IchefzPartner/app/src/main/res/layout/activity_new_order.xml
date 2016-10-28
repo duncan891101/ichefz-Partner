@@ -7,6 +7,11 @@
 
     <include layout="@layout/title_bar" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#CCCCCC"/>
+
     <com.playhut.partner.pullrefresh.PullToRefreshListView
         android:id="@+id/lv_pull_refresh"
         android:layout_width="match_parent"

@@ -31,6 +31,8 @@ public class NewOrderSetItem extends RelativeLayout {
 
     private TextView mQuantityTv;
 
+    private NewOrderSetAdapter mAdapter;
+
     public NewOrderSetItem(Context context) {
         super(context);
         init(context);
@@ -64,12 +66,13 @@ public class NewOrderSetItem extends RelativeLayout {
         mPriceTv = (TextView) findViewById(R.id.tv_price);
         mPersonTv = (TextView) findViewById(R.id.tv_person);
         mQuantityTv = (TextView) findViewById(R.id.tv_quantity);
+
+        mAdapter = new NewOrderSetAdapter(mContext);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     public void setRecyclerView(List<String> urlList) {
-        NewOrderSetAdapter adapter = new NewOrderSetAdapter(mContext);
-        mRecyclerView.setAdapter(adapter);
-        adapter.setData(urlList);
+        mAdapter.setData(urlList);
     }
 
     public void setName(String name) {

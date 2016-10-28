@@ -7,285 +7,298 @@
 
     <include layout="@layout/title_bar" />
 
-    <FrameLayout
-        android:id="@+id/fl_set"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_marginTop="10dp">
+        android:layout_height="1px"
+        android:background="#CCCCCC" />
 
-        <ImageView
-            android:id="@+id/iv_camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@mipmap/add_pack_camera" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <GridView
-            android:id="@+id/gv_img"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:numColumns="2"
-            android:visibility="gone" />
-
-    </FrameLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="#CCCCCC" />
-
-    <RelativeLayout
-        android:id="@+id/rl_set_name"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:background="@android:color/white">
-
-        <TextView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:text="Set name"
-            android:textColor="#333333"
-            android:textSize="15dp" />
+            android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/iv_arrow1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:src="@mipmap/arrow_right" />
+            <FrameLayout
+                android:id="@+id/fl_set"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginTop="10dp">
 
-        <TextView
-            android:id="@+id/tv_set_name"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@id/iv_arrow1"
-            android:gravity="right"
-            android:singleLine="true"
-            android:textColor="#999999"
-            android:textSize="14dp" />
-    </RelativeLayout>
+                <ImageView
+                    android:id="@+id/iv_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@mipmap/add_pack_camera" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="#CCCCCC" />
+                <GridView
+                    android:id="@+id/gv_img"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:numColumns="2"
+                    android:visibility="gone" />
 
-    <RelativeLayout
-        android:id="@+id/rl_desc"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:background="@android:color/white">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:text="Description"
-            android:textColor="#333333"
-            android:textSize="15dp" />
-
-        <ImageView
-            android:id="@+id/iv_arrow2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:src="@mipmap/arrow_right" />
-
-        <TextView
-            android:id="@+id/tv_desc"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@id/iv_arrow2"
-            android:gravity="right"
-            android:singleLine="true"
-            android:textColor="#999999"
-            android:textSize="14dp" />
-    </RelativeLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="#CCCCCC" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@android:color/white">
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/tv_person2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:text="2 Persons:"
-                android:textColor="#333333"
-                android:textSize="15dp" />
+            </FrameLayout>
 
             <View
-                android:layout_width="90dp"
+                android:layout_width="match_parent"
                 android:layout_height="1px"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="8dp"
-                android:layout_toRightOf="@id/tv_person2"
-                android:background="#333333" />
+                android:background="#CCCCCC" />
 
-            <TextView
-                android:id="@+id/tv_person2_$"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/tv_person2"
-                android:text="$"
-                android:textColor="#0099CC"
-                android:textSize="15dp" />
+            <RelativeLayout
+                android:id="@+id/rl_set_name"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@android:color/white">
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="Set name"
+                    android:textColor="#333333"
+                    android:textSize="15dp" />
 
-            <EditText
-                android:layout_width="65dp"
-                android:layout_height="30dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="5dp"
-                android:layout_toRightOf="@id/tv_person2_$"
-                android:background="@null"
-                android:gravity="center_vertical"
-                android:inputType="numberDecimal"
-                android:textColor="#0099CC"
-                android:textCursorDrawable="@null"
-                android:textSize="15dp" />
-        </RelativeLayout>
+                <ImageView
+                    android:id="@+id/iv_arrow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/arrow_right" />
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp">
-
-            <TextView
-                android:id="@+id/tv_person4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:text="4 Persons:"
-                android:textColor="#333333"
-                android:textSize="15dp" />
+                <TextView
+                    android:id="@+id/tv_set_name"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    android:layout_toLeftOf="@id/iv_arrow1"
+                    android:gravity="right"
+                    android:singleLine="true"
+                    android:textColor="#999999"
+                    android:textSize="14dp" />
+            </RelativeLayout>
 
             <View
-                android:layout_width="90dp"
+                android:layout_width="match_parent"
                 android:layout_height="1px"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="8dp"
-                android:layout_toRightOf="@id/tv_person4"
-                android:background="#333333" />
+                android:background="#CCCCCC" />
 
-            <TextView
-                android:id="@+id/tv_person4_$"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
+            <RelativeLayout
+                android:id="@+id/rl_desc"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="Description"
+                    android:textColor="#333333"
+                    android:textSize="15dp" />
+
+                <ImageView
+                    android:id="@+id/iv_arrow2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/arrow_right" />
+
+                <TextView
+                    android:id="@+id/tv_desc"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    android:layout_toLeftOf="@id/iv_arrow2"
+                    android:gravity="right"
+                    android:singleLine="true"
+                    android:textColor="#999999"
+                    android:textSize="14dp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#CCCCCC" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@android:color/white">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/tv_person2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="2 Persons:"
+                        android:textColor="#333333"
+                        android:textSize="15dp" />
+
+                    <View
+                        android:layout_width="90dp"
+                        android:layout_height="1px"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="8dp"
+                        android:layout_toRightOf="@id/tv_person2"
+                        android:background="#333333" />
+
+                    <TextView
+                        android:id="@+id/tv_person2_$"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@id/tv_person2"
+                        android:text="$"
+                        android:textColor="#0099CC"
+                        android:textSize="15dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true" />
+
+                    <EditText
+                        android:id="@+id/et_person2"
+                        android:layout_width="65dp"
+                        android:layout_height="30dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@id/tv_person2_$"
+                        android:background="@null"
+                        android:gravity="center_vertical"
+                        android:inputType="numberDecimal"
+                        android:textColor="#0099CC"
+                        android:textCursorDrawable="@null"
+                        android:textSize="15dp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp">
+
+                    <TextView
+                        android:id="@+id/tv_person4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="4 Persons:"
+                        android:textColor="#333333"
+                        android:textSize="15dp" />
+
+                    <View
+                        android:layout_width="90dp"
+                        android:layout_height="1px"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="8dp"
+                        android:layout_toRightOf="@id/tv_person4"
+                        android:background="#333333" />
+
+                    <TextView
+                        android:id="@+id/tv_person4_$"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@id/tv_person4"
+                        android:text="$"
+                        android:textColor="#0099CC"
+                        android:textSize="15dp" />
+
+                    <EditText
+                        android:id="@+id/et_person4"
+                        android:layout_width="65dp"
+                        android:layout_height="30dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@id/tv_person4_$"
+                        android:background="@null"
+                        android:gravity="center_vertical"
+                        android:inputType="numberDecimal"
+                        android:textColor="#0099CC"
+                        android:textCursorDrawable="@null"
+                        android:textSize="15dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_max_quantity"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="Maximum quantity"
+                    android:textColor="#333333"
+                    android:textSize="15dp" />
+
+                <ImageView
+                    android:id="@+id/iv_arrow4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/arrow_right" />
+
+                <TextView
+                    android:id="@+id/tv_max_quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    android:layout_toLeftOf="@id/iv_arrow4"
+                    android:gravity="right"
+                    android:singleLine="true"
+                    android:textColor="#999999"
+                    android:textSize="14dp" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#CCCCCC" />
+
+            <Button
+                android:id="@+id/btn_save"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="80dp"
                 android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/tv_person4"
-                android:text="$"
-                android:textColor="#0099CC"
-                android:textSize="15dp" />
+                android:layout_marginRight="10dp"
+                android:background="#0099CC"
+                android:text="Save"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="16dp" />
 
-            <EditText
-                android:layout_width="65dp"
-                android:layout_height="30dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="5dp"
-                android:layout_toRightOf="@id/tv_person4_$"
-                android:background="@null"
-                android:gravity="center_vertical"
-                android:inputType="numberDecimal"
-                android:textColor="#0099CC"
-                android:textCursorDrawable="@null"
-                android:textSize="15dp" />
-        </RelativeLayout>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rl_max_quantity"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:background="@android:color/white">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:text="Maximum quantity"
-            android:textColor="#333333"
-            android:textSize="15dp" />
-
-        <ImageView
-            android:id="@+id/iv_arrow4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:src="@mipmap/arrow_right" />
-
-        <TextView
-            android:id="@+id/tv_max_quantity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@id/iv_arrow4"
-            android:gravity="right"
-            android:singleLine="true"
-            android:textColor="#999999"
-            android:textSize="14dp" />
-
-    </RelativeLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="#CCCCCC" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <Button
-            android:id="@+id/btn_next"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="30dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="#0099CC"
-            android:text="Save"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="16dp" />
-    </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

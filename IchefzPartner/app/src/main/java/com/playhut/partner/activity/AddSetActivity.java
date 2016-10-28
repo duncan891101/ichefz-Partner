@@ -1,9 +1,11 @@
 package com.playhut.partner.activity;
 
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -18,6 +20,11 @@ import com.playhut.partner.constants.ChangeTypeConstants;
 import com.playhut.partner.constants.GlobalConstants;
 import com.playhut.partner.entity.FinanceDateEntity;
 import com.playhut.partner.entity.SelectPackEntity;
+import com.playhut.partner.mvp.presenter.IAddSetPresent;
+import com.playhut.partner.mvp.presenter.impl.AddSetPresent;
+import com.playhut.partner.mvp.view.AddSetView;
+import com.playhut.partner.network.IchefzException;
+import com.playhut.partner.utils.ToastUtils;
 import com.playhut.partner.widget.PartnerTitleBar;
 
 import java.util.ArrayList;
@@ -58,6 +65,10 @@ public class AddSetActivity extends BaseActivity implements View.OnClickListener
 
     private ArrayList<String> mSelectIdList;
 
+    private EditText mPerson2Et;
+
+    private EditText mPerson4Et;
+
     @Override
     protected void initView() {
         setContentView(R.layout.activity_add_set);
@@ -72,7 +83,10 @@ public class AddSetActivity extends BaseActivity implements View.OnClickListener
         mSetNameTv = (TextView) findViewById(R.id.tv_set_name);
         mDescTv = (TextView) findViewById(R.id.tv_desc);
         mMaxQuantityTv = (TextView) findViewById(R.id.tv_max_quantity);
-        mSaveBtn = (Button) findViewById(R.id.btn_next);
+        mSaveBtn = (Button) findViewById(R.id.btn_save);
+
+        mPerson2Et = (EditText) findViewById(R.id.et_person2);
+        mPerson4Et = (EditText) findViewById(R.id.et_person4);
     }
 
     @Override
@@ -150,10 +164,80 @@ public class AddSetActivity extends BaseActivity implements View.OnClickListener
                     }
                 });
                 break;
-            case R.id.btn_next:
-
+            case R.id.btn_save:
+                checkInputInfo();
                 break;
         }
+    }
+
+    private void checkInputInfo() {
+        if (mImageUrlList.size() == 0) {
+            ToastUtils.show("Please select from pack");
+            return;
+        }
+        if (TextUtils.isEmpty(mSetNameStr)) {
+            ToastUtils.show("Set name cannot be empty");
+            return;
+        }
+        if (TextUtils.isEmpty(mDescStr)) {
+            ToastUtils.show("Description cannot be empty");
+            return;
+        }
+        if (TextUtils.isEmpty(mMaxQuantityTv.getText().toString())) {
+            ToastUtils.show("Maximum quantity cannot be empty");
+            return;
+        }
+
+        String person2 = mPerson2Et.getText().toString().trim();
+        String person4 = mPerson4Et.getText().toString().trim();
+        if (TextUtils.isEmpty(person2)) {
+            ToastUtils.show("2 Persons price cannot be empty");
+            return;
+        }
+        if (TextUtils.isEmpty(person4)) {
+            ToastUtils.show("4 Persons price cannot be empty");
+            return;
+        }
+
+        toAddSet(person2, person4);
+    }
+
+    private void toAddSet(String person2, String person4) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < mSelectIdList.size(); i++) {
+            String id = mSelectIdList.get(i);
+            sb.append("\"");
+            sb.append(id);
+            sb.append("\"");
+            if (i != mSelectIdList.size() - 1){
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        IAddSetPresent present = new AddSetPresent(this, new AddSetView() {
+            @Override
+            public void startLoading() {
+                showLoadingDialog(getString(R.string.loading_dialog_loading), true);
+            }
+
+            @Override
+            public void loadSuccess() {
+                ToastUtils.show("Add set successfully");
+                AddSetActivity.this.finish();
+            }
+
+            @Override
+            public void finishLoading() {
+                dismissLoadingDialog();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                ToastUtils.show(exception.getErrorMsg());
+            }
+        });
+        present.add(sb.toString(), mSetNameStr, mDescStr, person2, person4, mMaxQuantityTv.getText().toString());
     }
 
     @Override

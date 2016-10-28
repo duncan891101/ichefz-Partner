@@ -7,6 +7,11 @@
 
     <include layout="@layout/title_bar" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#CCCCCC"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -213,6 +218,7 @@
                         android:focusable="true"/>
 
                     <EditText
+                        android:id="@+id/et_person2"
                         android:layout_width="65dp"
                         android:layout_height="30dp"
                         android:layout_centerVertical="true"
@@ -262,6 +268,7 @@
                         android:textSize="15dp" />
 
                     <EditText
+                        android:id="@+id/et_person4"
                         android:layout_width="65dp"
                         android:layout_height="30dp"
                         android:layout_centerVertical="true"

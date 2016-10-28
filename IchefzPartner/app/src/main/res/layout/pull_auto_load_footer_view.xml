@@ -6,8 +6,8 @@
     <LinearLayout
         android:id="@+id/pull_to_load_footer_content"
         android:layout_width="match_parent"
-        android:background="@android:color/white"
         android:layout_height="@dimen/pull_auto_load_footer_dis"
+        android:background="@android:color/white"
         android:gravity="center">
 
         <ImageView

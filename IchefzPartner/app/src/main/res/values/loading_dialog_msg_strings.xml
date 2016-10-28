@@ -8,4 +8,7 @@
     <string name="loading_dialog_send">Sending...</string>
     <string name="loading_dialog_upload">Upload...</string>
     <string name="loading_dialog_setting">Setting...</string>
+    <string name="loading_dialog_confirm">Confirm...</string>
+    <string name="loading_dialog_refund">Refund...</string>
+    <string name="loading_dialog_delete">Delete...</string>
 </resources>
