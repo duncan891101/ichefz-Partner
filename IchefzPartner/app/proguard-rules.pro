@@ -108,7 +108,7 @@
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
 # Application classes that will be serialized/deserialized over Gson
--keep class com.playhut.ichefz.entity.** { *; }
+-keep class com.playhut.partner.entity.** { *; }
 
 # Retrofit
 -dontwarn retrofit2.**
@@ -144,6 +144,12 @@
 # Baidu Push
 -dontwarn com.baidu.**
 -keep class com.baidu.**{*; }
+
+-keepnames class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}
+
+
 
 
 
