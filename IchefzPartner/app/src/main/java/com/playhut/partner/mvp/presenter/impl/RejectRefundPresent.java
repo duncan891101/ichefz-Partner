@@ -30,8 +30,8 @@ public class RejectRefundPresent extends BasePresenter implements IRejectRefundP
     }
 
     @Override
-    public void reject(String orderId) {
-        Observable<ResponseBody> apiResponseObservable = mNetworkModel.rejectRefund(orderId);
+    public void reject(String orderId, String reason) {
+        Observable<ResponseBody> apiResponseObservable = mNetworkModel.rejectRefund(orderId, reason);
         standardScheduler(mContext, apiResponseObservable, new StartLoadingListener() {
             @Override
             public void startLoading() {

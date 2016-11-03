@@ -6,6 +6,8 @@ import com.playhut.partner.network.ApiManager;
 import com.playhut.partner.network.FieldMapManager;
 import com.playhut.partner.networkservice.AddPackService;
 import com.playhut.partner.networkservice.AddPackTipsService;
+import com.playhut.partner.networkservice.EditPackWithImgService;
+import com.playhut.partner.networkservice.EditTipService;
 import com.playhut.partner.networkservice.UploadAvatarService;
 
 import java.io.File;
@@ -52,8 +54,16 @@ public class UploadFileModel {
         privateMap.put("title", title);
         privateMap.put("brief_introduction", brief);
         privateMap.put("desc", desc);
-        privateMap.put("person2", person2);
-        privateMap.put("person4", person4);
+        if (!TextUtils.isEmpty(person2)) {
+            privateMap.put("person2", person2);
+        } else {
+            privateMap.put("person2", String.valueOf(-1));
+        }
+        if (!TextUtils.isEmpty(person4)) {
+            privateMap.put("person4", person4);
+        } else {
+            privateMap.put("person4", String.valueOf(-1));
+        }
         privateMap.put("max_quantity", maxQuantity);
         if (!TextUtils.isEmpty(howMade)) {
             privateMap.put("how_it_make", howMade);
@@ -99,6 +109,75 @@ public class UploadFileModel {
         }
         AddPackTipsService addPackTipsService = ApiManager.create(AddPackTipsService.class);
         return addPackTipsService.add(paramsMap);
+    }
+
+    /**
+     * edit pack
+     */
+    public Observable<ResponseBody> editPack(File file, String menuId, String title, String brief, String desc, String person2, String person4,
+                                             String maxQuantity, String howMade) {
+        Map<String, String> privateMap = new TreeMap<>();
+        privateMap.put("menu_id", menuId);
+        privateMap.put("title", title);
+        privateMap.put("brief_introduction", brief);
+        privateMap.put("desc", desc);
+        if (!TextUtils.isEmpty(person2)) {
+            privateMap.put("person2", person2);
+        } else {
+            privateMap.put("person2", String.valueOf(-1));
+        }
+        if (!TextUtils.isEmpty(person4)) {
+            privateMap.put("person4", person4);
+        } else {
+            privateMap.put("person4", String.valueOf(-1));
+        }
+        privateMap.put("max_quantity", maxQuantity);
+        if (!TextUtils.isEmpty(howMade)) {
+            privateMap.put("how_it_make", howMade);
+        }
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
+
+        Map<String, RequestBody> paramsMap = new TreeMap<>();
+        Set<String> set = fieldMap.keySet();
+        for (String key : set) {
+            String value = fieldMap.get(key);
+            paramsMap.put(key, RequestBody.create(MediaType.parse("text/plain"), value));
+        }
+        paramsMap.put("menu_img\"; filename=\"" + file.getName() + "\"",
+                RequestBody.create(MediaType.parse("multipart/form-data"), file));
+
+        EditPackWithImgService editPackWithImgService = ApiManager.create(EditPackWithImgService.class);
+        return editPackWithImgService.edit(paramsMap);
+    }
+
+    /**
+     * edit pack tips  ingredient instruction
+     */
+    public Observable<ResponseBody> editTip(String menuId, int type, String ids, Map<String, File> map, String titles, String descs) {
+        Map<String, String> privateMap = new TreeMap<>();
+        privateMap.put("menu_id", menuId);
+        privateMap.put("type", String.valueOf(type));
+        privateMap.put("ids", ids);
+        privateMap.put("titles", titles);
+        privateMap.put("descs", descs);
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
+
+        Map<String, RequestBody> paramsMap = new TreeMap<>();
+        Set<String> set = fieldMap.keySet();
+        for (String key : set) {
+            String value = fieldMap.get(key);
+            paramsMap.put(key, RequestBody.create(MediaType.parse("text/plain"), value));
+        }
+        if (map != null && map.size() > 0) {
+            Set<String> keySet = map.keySet();
+            for (String key : keySet) {
+                File file = map.get(key);
+                paramsMap.put(key + "\"; filename=\"" + file.getName() + "\"",
+                        RequestBody.create(MediaType.parse("multipart/form-data"), file));
+            }
+        }
+        EditTipService editTipService = ApiManager.create(EditTipService.class);
+        return editTipService.edit(paramsMap);
     }
 
 }

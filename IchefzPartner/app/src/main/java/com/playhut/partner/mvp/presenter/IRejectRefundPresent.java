@@ -5,6 +5,6 @@ package com.playhut.partner.mvp.presenter;
  */
 public interface IRejectRefundPresent {
 
-    void reject(String orderId);
+    void reject(String orderId, String reason);
 
 }

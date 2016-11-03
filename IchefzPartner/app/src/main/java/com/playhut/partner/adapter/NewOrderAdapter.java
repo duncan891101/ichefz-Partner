@@ -12,23 +12,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.playhut.partner.R;
+import com.playhut.partner.activity.PendingActivity;
 import com.playhut.partner.activity.RefundActivity;
 import com.playhut.partner.base.BaseActivity;
 import com.playhut.partner.constants.OrderState;
 import com.playhut.partner.entity.NewOrderEntity;
-import com.playhut.partner.eventbus.RefundOrderEB;
 import com.playhut.partner.mvp.presenter.IConfirmOrderPresent;
-import com.playhut.partner.mvp.presenter.IConfirmRefundPresent;
-import com.playhut.partner.mvp.presenter.IRefundOrderPresent;
-import com.playhut.partner.mvp.presenter.IRejectRefundPresent;
 import com.playhut.partner.mvp.presenter.impl.ConfirmOrderPresent;
-import com.playhut.partner.mvp.presenter.impl.ConfirmRefundPresent;
-import com.playhut.partner.mvp.presenter.impl.RefundOrderPresent;
-import com.playhut.partner.mvp.presenter.impl.RejectRefundPresent;
 import com.playhut.partner.mvp.view.ConfirmOrderView;
-import com.playhut.partner.mvp.view.ConfirmRefundView;
-import com.playhut.partner.mvp.view.RefundOrderView;
-import com.playhut.partner.mvp.view.RejectRefundView;
 import com.playhut.partner.network.IchefzException;
 import com.playhut.partner.ui.NewOrderPackItem;
 import com.playhut.partner.ui.NewOrderSetItem;
@@ -37,8 +28,6 @@ import com.playhut.partner.utils.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.greenrobot.event.Subscribe;
 
 /**
  *
@@ -49,13 +38,9 @@ public class NewOrderAdapter extends BaseAdapter {
 
     private List<NewOrderEntity.Order> mList;
 
-    public static final String CONFIRM_ORDER = "Confirm order";
+    public static final String REFUND = "Refund";
 
-    public static final String CONFIRM_REFUND = "Confirm refund";
-
-    public static final String CHEF_REFUND_IN_THIS_ORDER = "Chef refund order"; // New order里的Refund按钮和其他订单Confirmed栏里的Refund按钮
-
-    public static final String CUSTOMER_REFUND_IN_THIS_ORDER = "Customer refund order"; // 其他订单Refund栏里的Refund，此状态是厨师已接单，用户发起退款后，订单进入该状态，让厨师去确认是否能退款
+    public static final String PENDING = "Pending";
 
     private Dialog mConfirmDialog;
 
@@ -143,15 +128,14 @@ public class NewOrderAdapter extends BaseAdapter {
             case OrderState.PAID_WAIT_CONFIRM:
                 // 支付完成，等待厨师确认接单
                 holder.mRefundBtn.setVisibility(View.VISIBLE);
-                holder.mRefundBtn.setTag(CHEF_REFUND_IN_THIS_ORDER);
+                holder.mRefundBtn.setText(REFUND);
                 holder.mConfirmBtn.setVisibility(View.VISIBLE);
-                holder.mConfirmBtn.setText(CONFIRM_ORDER);
                 holder.mTagIv.setImageResource(R.mipmap.history_wait_to_confirm);
                 break;
             case OrderState.PAID_WAIT_RECEIPT:
                 // 厨师已确认接单，等待客户收货
                 holder.mRefundBtn.setVisibility(View.VISIBLE);
-                holder.mRefundBtn.setTag(CHEF_REFUND_IN_THIS_ORDER);
+                holder.mRefundBtn.setText(REFUND);
                 holder.mTagIv.setImageResource(R.mipmap.history_confirm);
                 break;
             case OrderState.FINISHED:
@@ -166,9 +150,7 @@ public class NewOrderAdapter extends BaseAdapter {
                 } else {
                     // 厨师处理
                     holder.mRefundBtn.setVisibility(View.VISIBLE);
-                    holder.mRefundBtn.setTag(CUSTOMER_REFUND_IN_THIS_ORDER);
-                    holder.mConfirmBtn.setVisibility(View.VISIBLE);
-                    holder.mConfirmBtn.setText(CONFIRM_REFUND);
+                    holder.mRefundBtn.setText(PENDING);
                     holder.mTagIv.setImageResource(R.mipmap.history_refund_chef_isprogress);
                 }
                 break;
@@ -239,14 +221,8 @@ public class NewOrderAdapter extends BaseAdapter {
 
         @Override
         public void onClick(View v) {
-            Button button = (Button) v;
-            if (CONFIRM_ORDER.equals(button.getText().toString())) {
-                // New Order里的确认接单
-                showConfirmDialog("Confirm", "Are you sure to confirm the order?", 1, mPosition);
-            } else {
-                // 其他订单里的Refund确认退款
-                showConfirmDialog("Confirm", "Are you sure to refund the order?", 2, mPosition);
-            }
+            // New Order里的确认接单
+            showConfirmDialog("Confirm", "Are you sure to confirm the order?", mPosition);
         }
     }
 
@@ -263,16 +239,18 @@ public class NewOrderAdapter extends BaseAdapter {
 
         @Override
         public void onClick(View v) {
-            String tag = (String) v.getTag();
-            if (CHEF_REFUND_IN_THIS_ORDER.equals(tag)) {
+            Button button = (Button) v;
+            if (REFUND.equals(button.getText().toString())) {
                 RefundActivity.actionIntent(mContext, mList.get(mPosition).order_id, mPosition);
             } else {
-                showConfirmDialog("Reject", "Are you sure to reject order of refund?", 3, mPosition);
+                // Pending
+                NewOrderEntity.Order entity = mList.get(mPosition);
+                PendingActivity.actionIntent(mContext, entity, NewOrderAdapter.this);
             }
         }
     }
 
-    private void showConfirmDialog(String title, String text, final int type, final int position) {
+    private void showConfirmDialog(String title, String text, final int position) {
         if (mConfirmDialog == null || !mConfirmDialog.isShowing()) {
             mConfirmDialog = DialogUtils.showConfirmDialog(mContext, R.layout.confirm_dialog_layout, true);
         }
@@ -293,16 +271,8 @@ public class NewOrderAdapter extends BaseAdapter {
             public void onClick(View v) {
                 dismissConfirmDialog();
                 String orderId = mList.get(position).order_id;
-                if (type == 1) {
-                    // 确认订单（接单）
-                    toConfirmOrder(position, orderId);
-                } else if (type == 2) {
-                    // 确认退款
-                    toConfirmRefund(position, orderId);
-                } else {
-                    // 拒绝退款
-                    toRejectRefund(position, orderId);
-                }
+                // 确认订单（接单）
+                toConfirmOrder(position, orderId);
             }
         });
     }
@@ -341,68 +311,6 @@ public class NewOrderAdapter extends BaseAdapter {
             }
         });
         present.confirm(orderId);
-    }
-
-    private void toConfirmRefund(final int position, String orderId) {
-        IConfirmRefundPresent present = new ConfirmRefundPresent(mContext, new ConfirmRefundView() {
-            @Override
-            public void startLoading() {
-                BaseActivity activity = (BaseActivity) mContext;
-                activity.showLoadingDialog(mContext.getString(R.string.loading_dialog_confirm), false);
-            }
-
-            @Override
-            public void loadSuccess(String info) {
-                // 进入后台审核状态
-                NewOrderEntity.Order order = mList.get(position);
-                order.chef_handle = 0;
-                order.order_state = OrderState.APPLY_REFUND;
-                notifyDataSetChanged();
-                ToastUtils.show(info);
-            }
-
-            @Override
-            public void finishLoading() {
-                BaseActivity activity = (BaseActivity) mContext;
-                activity.dismissLoadingDialog();
-            }
-
-            @Override
-            public void loadFailure(IchefzException exception) {
-                ToastUtils.show(exception.getErrorMsg());
-            }
-        });
-        present.refund(orderId);
-    }
-
-    private void toRejectRefund(final int position, String orderId) {
-        IRejectRefundPresent present = new RejectRefundPresent(mContext, new RejectRefundView() {
-            @Override
-            public void startLoading() {
-                BaseActivity activity = (BaseActivity) mContext;
-                activity.showLoadingDialog(mContext.getString(R.string.loading_dialog_loading), false);
-            }
-
-            @Override
-            public void loadSuccess(String info) {
-                NewOrderEntity.Order order = mList.get(position);
-                order.order_state = OrderState.REFUND_REJECT;
-                notifyDataSetChanged();
-                ToastUtils.show(info);
-            }
-
-            @Override
-            public void finishLoading() {
-                BaseActivity activity = (BaseActivity) mContext;
-                activity.dismissLoadingDialog();
-            }
-
-            @Override
-            public void loadFailure(IchefzException exception) {
-                ToastUtils.show(exception.getErrorMsg());
-            }
-        });
-        present.reject(orderId);
     }
 
     static class Holder {

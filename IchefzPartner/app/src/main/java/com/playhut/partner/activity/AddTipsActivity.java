@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import com.playhut.partner.R;
 import com.playhut.partner.base.BaseActivity;
 import com.playhut.partner.business.ChooseAvatarBusiness;
+import com.playhut.partner.constants.AddTipConstants;
 import com.playhut.partner.constants.GlobalConstants;
 import com.playhut.partner.mvp.presenter.IAddPackTipsPresent;
 import com.playhut.partner.mvp.presenter.impl.AddPackTipsPresent;
@@ -36,8 +37,6 @@ public class AddTipsActivity extends BaseActivity implements View.OnClickListene
     private RelativeLayout mAddLayout;
 
     private ChooseAvatarBusiness mChooseAvatarBusiness;
-
-    private static final int MAX_ITEM_NUM = 6;
 
     private Button mNextBtn;
 
@@ -77,14 +76,6 @@ public class AddTipsActivity extends BaseActivity implements View.OnClickListene
     protected void initTitleBar() {
         titleBar = new PartnerTitleBar(this);
         titleBar.setCenterTvVisiable(true);
-        titleBar.setRightTv2Visiable(true);
-        titleBar.setRightTv2Content("Jump");
-        titleBar.setRightTv2Listener(new PartnerTitleBar.TitleBarClickListener() {
-            @Override
-            public void onClick() {
-                jumpToNext();
-            }
-        });
     }
 
     @Override
@@ -124,19 +115,18 @@ public class AddTipsActivity extends BaseActivity implements View.OnClickListene
                     @Override
                     public void select(Bitmap bitmap, File file) {
                         AddTipsItemView addTipsItemView = new AddTipsItemView(AddTipsActivity.this);
-                        addTipsItemView.setId(mChooseAvatarID);
+                        addTipsItemView.setChooseAvatarId(mChooseAvatarID);
                         mChooseAvatarID++;
                         addTipsItemView.setImageView(bitmap, file);
                         addTipsItemView.setAddTipDeleteListener(new ItemDeleteListener());
                         addTipsItemView.setAddTipClickListener(new ImageClickListener());
                         mContainerLayout.addView(addTipsItemView);
-
                         setAddLayoutState();
                     }
                 });
                 break;
             case R.id.btn_next:
-                checkInputInfo();
+                checkAddInputInfo();
                 break;
         }
     }
@@ -144,7 +134,7 @@ public class AddTipsActivity extends BaseActivity implements View.OnClickListene
     private class ImageClickListener implements AddTipsItemView.AddTipClickListener {
         @Override
         public void onClick(final AddTipsItemView addTipsItemView) {
-            int id = addTipsItemView.getId();
+            int id = addTipsItemView.getChooseAvatarId();
             mClickImageChooseBusiness = new ChooseAvatarBusiness(AddTipsActivity.this, width, height, id, id + 400, id + 900);
             mClickImageChooseBusiness.showChooseAvatarDialog(new ChooseAvatarBusiness.UserSelectAvatarListener() {
                 @Override
@@ -157,42 +147,46 @@ public class AddTipsActivity extends BaseActivity implements View.OnClickListene
 
     private class ItemDeleteListener implements AddTipsItemView.AddTipDeleteListener {
         @Override
-        public void onDelete(LinearLayout item) {
+        public void onDelete(AddTipsItemView item) {
             mContainerLayout.removeView(item);
             setAddLayoutState();
         }
     }
 
-    private void checkInputInfo() {
-        List<File> fileList = new ArrayList<>();
-        JSONArray titleArray = new JSONArray();
-        JSONArray descArray = new JSONArray();
+    private void checkAddInputInfo() {
         int childCount = mContainerLayout.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            AddTipsItemView addTipsItemView = (AddTipsItemView) mContainerLayout.getChildAt(i);
-            File file = addTipsItemView.getImageFile();
-            if (file == null || !file.isFile() || !file.exists()) {
-                ToastUtils.show("Upload photo cannot be empty");
-                break;
-            }
-            String title = addTipsItemView.getTitle();
-            if (TextUtils.isEmpty(title)) {
-                ToastUtils.show("Title cannot be empty");
-                break;
-            }
-            String desc = addTipsItemView.getDesc();
-            if (TextUtils.isEmpty(desc)) {
-                ToastUtils.show("Description cannot be empty");
-                break;
+        if (childCount > 0) {
+            List<File> fileList = new ArrayList<>();
+            JSONArray titleArray = new JSONArray();
+            JSONArray descArray = new JSONArray();
+            for (int i = 0; i < childCount; i++) {
+                AddTipsItemView addTipsItemView = (AddTipsItemView) mContainerLayout.getChildAt(i);
+                File file = addTipsItemView.getImageFile();
+                if (file == null || !file.isFile() || !file.exists()) {
+                    ToastUtils.show("Upload photo cannot be empty");
+                    break;
+                }
+                String title = addTipsItemView.getTitle();
+                if (TextUtils.isEmpty(title)) {
+                    ToastUtils.show("Title cannot be empty");
+                    break;
+                }
+                String desc = addTipsItemView.getDesc();
+                if (TextUtils.isEmpty(desc)) {
+                    ToastUtils.show("Description cannot be empty");
+                    break;
+                }
+
+                fileList.add(file);
+                titleArray.put(title);
+                descArray.put(desc);
             }
 
-            fileList.add(file);
-            titleArray.put(title);
-            descArray.put(desc);
-        }
-
-        if (fileList.size() == childCount && titleArray.length() == childCount && descArray.length() == childCount) {
-            toAddPackTips(fileList, titleArray.toString(), descArray.toString());
+            if (fileList.size() == childCount && titleArray.length() == childCount && descArray.length() == childCount) {
+                toAddPackTips(fileList, titleArray.toString(), descArray.toString());
+            }
+        } else {
+            jumpToNext();
         }
     }
 
@@ -230,15 +224,10 @@ public class AddTipsActivity extends BaseActivity implements View.OnClickListene
 
     private void setAddLayoutState() {
         int childCount = mContainerLayout.getChildCount();
-        if (childCount >= MAX_ITEM_NUM) {
+        if (childCount >= AddTipConstants.MAX_ITEM_NUM) {
             mAddLayout.setVisibility(View.GONE);
         } else {
             mAddLayout.setVisibility(View.VISIBLE);
-        }
-        if (childCount > 0) {
-            mNextBtn.setVisibility(View.VISIBLE);
-        } else {
-            mNextBtn.setVisibility(View.GONE);
         }
     }
 
@@ -252,19 +241,19 @@ public class AddTipsActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void jumpToNext() {
-        if (mType == ADD_TIPS_TYPE){
+        if (mType == ADD_TIPS_TYPE) {
             Intent intent = new Intent(this, AddTipsActivity.class);
             intent.putExtra(AddTipsActivity.MENU_ID_INTENT, mMenuId);
             intent.putExtra(AddTipsActivity.ADD_TYPE_INTENT, AddTipsActivity.ADD_INGREDIENT_TYPE);
             startActivity(intent);
             AddTipsActivity.this.finish();
-        } else if (mType == ADD_INGREDIENT_TYPE){
+        } else if (mType == ADD_INGREDIENT_TYPE) {
             Intent intent = new Intent(this, AddTipsActivity.class);
             intent.putExtra(AddTipsActivity.MENU_ID_INTENT, mMenuId);
             intent.putExtra(AddTipsActivity.ADD_TYPE_INTENT, AddTipsActivity.ADD_INSTRUCTION_TYPE);
             startActivity(intent);
             AddTipsActivity.this.finish();
-        } else if (mType == ADD_INSTRUCTION_TYPE){
+        } else if (mType == ADD_INSTRUCTION_TYPE) {
             AddTipsActivity.this.finish();
         }
     }

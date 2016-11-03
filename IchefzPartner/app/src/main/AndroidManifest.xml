@@ -113,6 +113,24 @@
             android:name=".activity.RefundActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"/>
+        <activity
+            android:name=".activity.EditPack1Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.EditPack2Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.EditTipActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.EditAddTipActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.PendingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.IntroduceActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

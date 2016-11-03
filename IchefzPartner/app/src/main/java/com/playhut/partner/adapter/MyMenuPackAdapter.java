@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.playhut.partner.R;
+import com.playhut.partner.activity.EditPack1Activity;
 import com.playhut.partner.base.BaseActivity;
 import com.playhut.partner.constants.PackState;
 import com.playhut.partner.entity.MyMenuPackEntity;
@@ -80,6 +81,7 @@ public class MyMenuPackAdapter extends BaseAdapter {
         DeleteListener deleteListener = null;
         CancelListener cancelListener = null;
         CheckBoxChangeListener checkBoxChangeListener = null;
+        EditListener editListener = null;
         if (convertView == null) {
             convertView = View.inflate(mContext, R.layout.my_menu_pack_item_layout, null);
             holder = new Holder();
@@ -100,6 +102,8 @@ public class MyMenuPackAdapter extends BaseAdapter {
             holder.mDeleteBtn.setOnClickListener(deleteListener);
 
             holder.mEditBtn = (Button) convertView.findViewById(R.id.btn_edit);
+            editListener = new EditListener();
+            holder.mEditBtn.setOnClickListener(editListener);
 
             holder.mStateCb = (ImageView) convertView.findViewById(R.id.cb_state);
             checkBoxChangeListener = new CheckBoxChangeListener();
@@ -119,18 +123,21 @@ public class MyMenuPackAdapter extends BaseAdapter {
             convertView.setTag(holder.mDeleteBtn.getId(), deleteListener);
             convertView.setTag(holder.mCancelBtn.getId(), cancelListener);
             convertView.setTag(holder.mStateCb.getId(), checkBoxChangeListener);
+            convertView.setTag(holder.mEditBtn.getId(), editListener);
         } else {
             holder = (Holder) convertView.getTag();
             expandClickListener = (ExpandClickListener) convertView.getTag(holder.mArrowIv.getId());
             deleteListener = (DeleteListener) convertView.getTag(holder.mDeleteBtn.getId());
             cancelListener = (CancelListener) convertView.getTag(holder.mCancelBtn.getId());
             checkBoxChangeListener = (CheckBoxChangeListener) convertView.getTag(holder.mStateCb.getId());
+            editListener = (EditListener) convertView.getTag(holder.mEditBtn.getId());
         }
 
         expandClickListener.setPosition(position);
         deleteListener.setPosition(position);
         cancelListener.setPosition(position);
         checkBoxChangeListener.setPosition(position);
+        editListener.setPosition(position);
 
         MyMenuPackEntity.PackInfo packInfo = mList.get(position);
 
@@ -138,11 +145,23 @@ public class MyMenuPackAdapter extends BaseAdapter {
 
         holder.mTitleTv.setText(packInfo.pack_title);
 
-        String person2Str = String.format(mContext.getString(R.string.my_menu_person2), packInfo.person2);
-        holder.mPerson2Tv.setText(person2Str);
+        String person2 = packInfo.person2;
+        if ("0".equals(person2)) {
+            holder.mPerson2Tv.setVisibility(View.GONE);
+        } else {
+            holder.mPerson2Tv.setVisibility(View.VISIBLE);
+            String person2Str = String.format(mContext.getString(R.string.my_menu_person2), person2);
+            holder.mPerson2Tv.setText(person2Str);
+        }
 
-        String person4Str = String.format(mContext.getString(R.string.my_menu_person4), packInfo.person4);
-        holder.mPerson4Tv.setText(person4Str);
+        String person4 = packInfo.person4;
+        if ("0".equals(person4)) {
+            holder.mPerson4Tv.setVisibility(View.GONE);
+        } else {
+            holder.mPerson4Tv.setVisibility(View.VISIBLE);
+            String person4Str = String.format(mContext.getString(R.string.my_menu_person4), person4);
+            holder.mPerson4Tv.setText(person4Str);
+        }
 
         boolean expandState = packInfo.expandState;
         if (expandState) {
@@ -404,6 +423,21 @@ public class MyMenuPackAdapter extends BaseAdapter {
             }
         }
 
+    }
+
+    private class EditListener implements View.OnClickListener {
+
+        private int mPosition;
+
+        public void setPosition(int position){
+            this.mPosition = position;
+        }
+
+        @Override
+        public void onClick(View v) {
+            MyMenuPackEntity.PackInfo packInfo = mList.get(mPosition);
+            EditPack1Activity.actionIntent(mContext, packInfo);
+        }
     }
 
     static class Holder {

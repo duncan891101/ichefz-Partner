@@ -64,7 +64,7 @@ public class FinanceChartView extends View {
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
 
-        mYMaxPixel = PartnerUtils.dip2px(context, 140);
+        mYMaxPixel = PartnerUtils.dip2px(context, 138);
         mYMaxPointPixel = (int) (mYMaxPixel * 0.8f);
         mRadius = PartnerUtils.dip2px(context, 6);
         mXMarginPixel = PartnerUtils.dip2px(context, 50);
@@ -98,7 +98,7 @@ public class FinanceChartView extends View {
 
     public void setData(float[] data) {
         mData = data;
-        invalidate();
+        requestLayout();
     }
 
     @Override

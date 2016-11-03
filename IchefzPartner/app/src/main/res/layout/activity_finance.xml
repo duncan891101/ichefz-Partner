@@ -7,8 +7,8 @@
 
     <include layout="@layout/title_bar" />
 
-    <com.playhut.partner.pullrefresh.PullToRefreshScrollView
-        android:id="@+id/sv_pull_refresh"
+    <com.playhut.partner.widget.AutoLoadScrollView
+        android:id="@+id/sv_auto_load"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

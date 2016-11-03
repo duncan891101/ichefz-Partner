@@ -10,7 +10,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#CCCCCC"/>
+        android:background="#CCCCCC" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -178,109 +178,125 @@
                 android:layout_height="50dp"
                 android:background="@android:color/white">
 
-                <RelativeLayout
+                <ImageView
+                    android:id="@+id/cb_person2"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:src="@mipmap/menu_price_cb_uncheck"
+                    android:layout_marginRight="5dp"
+                    android:padding="5dp"/>
 
-                    <TextView
-                        android:id="@+id/tv_person2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"
-                        android:text="2 Persons:"
-                        android:textColor="#333333"
-                        android:textSize="15dp" />
-
-                    <View
-                        android:layout_width="90dp"
-                        android:layout_height="1px"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginBottom="8dp"
-                        android:layout_toRightOf="@id/tv_person2"
-                        android:background="#333333" />
-
-                    <TextView
-                        android:id="@+id/tv_person2_$"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_toRightOf="@id/tv_person2"
-                        android:text="$"
-                        android:textColor="#0099CC"
-                        android:textSize="15dp" />
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:focusableInTouchMode="true"
-                        android:focusable="true"/>
-
-                    <EditText
-                        android:id="@+id/et_person2"
-                        android:layout_width="65dp"
-                        android:layout_height="30dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="5dp"
-                        android:layout_toRightOf="@id/tv_person2_$"
-                        android:background="@null"
-                        android:gravity="center_vertical"
-                        android:inputType="numberDecimal"
-                        android:textColor="#0099CC"
-                        android:textCursorDrawable="@null"
-                        android:textSize="15dp" />
-                </RelativeLayout>
-
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/tv_person2"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="10dp">
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/cb_person2"
+                    android:text="2 Persons:"
+                    android:textColor="#333333"
+                    android:textSize="15dp" />
 
-                    <TextView
-                        android:id="@+id/tv_person4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"
-                        android:text="4 Persons:"
-                        android:textColor="#333333"
-                        android:textSize="15dp" />
+                <View
+                    android:layout_width="150dp"
+                    android:layout_height="1px"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_toRightOf="@id/tv_person2"
+                    android:background="#333333" />
 
-                    <View
-                        android:layout_width="90dp"
-                        android:layout_height="1px"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginBottom="8dp"
-                        android:layout_toRightOf="@id/tv_person4"
-                        android:background="#333333" />
+                <TextView
+                    android:id="@+id/tv_person2_$"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/tv_person2"
+                    android:text="$"
+                    android:textColor="#0099CC"
+                    android:textSize="15dp" />
 
-                    <TextView
-                        android:id="@+id/tv_person4_$"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_toRightOf="@id/tv_person4"
-                        android:text="$"
-                        android:textColor="#0099CC"
-                        android:textSize="15dp" />
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
 
-                    <EditText
-                        android:id="@+id/et_person4"
-                        android:layout_width="65dp"
-                        android:layout_height="30dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="5dp"
-                        android:layout_toRightOf="@id/tv_person4_$"
-                        android:background="@null"
-                        android:gravity="center_vertical"
-                        android:inputType="numberDecimal"
-                        android:textColor="#0099CC"
-                        android:textCursorDrawable="@null"
-                        android:textSize="15dp" />
-                </RelativeLayout>
+                <EditText
+                    android:id="@+id/et_person2"
+                    android:layout_width="125dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toRightOf="@id/tv_person2_$"
+                    android:background="@null"
+                    android:visibility="gone"
+                    android:gravity="center_vertical"
+                    android:inputType="numberDecimal"
+                    android:textColor="#0099CC"
+                    android:textCursorDrawable="@null"
+                    android:textSize="15dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@android:color/white">
+
+                <ImageView
+                    android:id="@+id/cb_person4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:src="@mipmap/menu_price_cb_uncheck"
+                    android:layout_marginRight="5dp"
+                    android:padding="5dp"/>
+
+                <TextView
+                    android:id="@+id/tv_person4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/cb_person4"
+                    android:text="4 Persons:"
+                    android:textColor="#333333"
+                    android:textSize="15dp" />
+
+                <View
+                    android:layout_width="150dp"
+                    android:layout_height="1px"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_toRightOf="@id/tv_person4"
+                    android:background="#333333" />
+
+                <TextView
+                    android:id="@+id/tv_person4_$"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/tv_person4"
+                    android:text="$"
+                    android:textColor="#0099CC"
+                    android:textSize="15dp" />
+
+                <EditText
+                    android:id="@+id/et_person4"
+                    android:layout_width="125dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toRightOf="@id/tv_person4_$"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:inputType="numberDecimal"
+                    android:textColor="#0099CC"
+                    android:visibility="gone"
+                    android:textCursorDrawable="@null"
+                    android:textSize="15dp" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -382,6 +398,10 @@
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="30dp" />
 
         </LinearLayout>
     </ScrollView>

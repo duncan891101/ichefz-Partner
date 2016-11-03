@@ -1,5 +1,6 @@
 package com.playhut.partner.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
@@ -11,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.playhut.partner.R;
 import com.playhut.partner.base.BaseActivity;
 import com.playhut.partner.business.ChooseAvatarBusiness;
@@ -20,11 +23,19 @@ import com.playhut.partner.constants.GlobalConstants;
 import com.playhut.partner.debug.MyLog;
 import com.playhut.partner.entity.AddPackEntity;
 import com.playhut.partner.entity.FinanceDateEntity;
+import com.playhut.partner.entity.MyMenuPackEntity;
 import com.playhut.partner.eventbus.AddPackEB;
 import com.playhut.partner.mvp.presenter.IAddPackPresent;
+import com.playhut.partner.mvp.presenter.IEditPackPresent;
+import com.playhut.partner.mvp.presenter.IEditPackWithImgPresent;
 import com.playhut.partner.mvp.presenter.impl.AddPackPresent;
+import com.playhut.partner.mvp.presenter.impl.EditPackPresent;
+import com.playhut.partner.mvp.presenter.impl.EditPackWithImgPresent;
 import com.playhut.partner.mvp.view.AddPackView;
+import com.playhut.partner.mvp.view.EditPackView;
+import com.playhut.partner.mvp.view.EditPackWithImgView;
 import com.playhut.partner.network.IchefzException;
+import com.playhut.partner.utils.ImageLoderOptionUtils;
 import com.playhut.partner.utils.ToastUtils;
 import com.playhut.partner.widget.PartnerTitleBar;
 
@@ -79,6 +90,17 @@ public class AddPackActivity extends BaseActivity implements View.OnClickListene
 
     private EditText mPerson4Et;
 
+    private static MyMenuPackEntity.PackInfo mPackInfo;
+
+    private ImageView mPerson2Cb;
+
+    private ImageView mPerson4Cb;
+
+    public static void actionIntent(Context context, MyMenuPackEntity.PackInfo packInfo) {
+        mPackInfo = packInfo;
+        context.startActivity(new Intent(context, AddPackActivity.class));
+    }
+
     @Override
     protected void initView() {
         setContentView(R.layout.activity_add_pack);
@@ -101,13 +123,20 @@ public class AddPackActivity extends BaseActivity implements View.OnClickListene
 
         mPerson2Et = (EditText) findViewById(R.id.et_person2);
         mPerson4Et = (EditText) findViewById(R.id.et_person4);
+
+        mPerson2Cb = (ImageView) findViewById(R.id.cb_person2);
+        mPerson4Cb = (ImageView) findViewById(R.id.cb_person4);
     }
 
     @Override
     protected void initTitleBar() {
         PartnerTitleBar titleBar = new PartnerTitleBar(this);
         titleBar.setCenterTvVisiable(true);
-        titleBar.setCenterTvContent("Add more to pack");
+        if (mPackInfo == null) {
+            titleBar.setCenterTvContent("Add more to pack");
+        } else {
+            titleBar.setCenterTvContent("Edit pack");
+        }
         titleBar.setLeftIvVisiable(true);
         titleBar.setLeftIvContent(R.mipmap.back_black);
         titleBar.setLeftIvClickListener(new PartnerTitleBar.TitleBarClickListener() {
@@ -130,6 +159,8 @@ public class AddPackActivity extends BaseActivity implements View.OnClickListene
         mCameraIv.setOnClickListener(this);
         mPackIv.setOnClickListener(this);
         mNextBtn.setOnClickListener(this);
+        mPerson2Cb.setOnClickListener(this);
+        mPerson4Cb.setOnClickListener(this);
         mChooseAvatarBusiness = new ChooseAvatarBusiness(this, width, height);
         // 初始化Max Quantity数值
         mSelectCountryBusiness = new SelectCountryBusiness(this);
@@ -144,11 +175,88 @@ public class AddPackActivity extends BaseActivity implements View.OnClickListene
             entity.setText(mQuantityStrings[i]);
             mMaxQuantityList.add(entity);
         }
+
+        if (mPackInfo == null) {
+            mNextBtn.setText("Next");
+        } else {
+            mNextBtn.setText("Save");
+        }
     }
 
     @Override
     protected void initLogic() {
+        if (mPackInfo != null) {
+            // Edit pack
+            String url = mPackInfo.pack_img;
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            DisplayImageOptions options = ImageLoderOptionUtils.setOptions(0, 0, 0);
+            imageLoader.displayImage(url, mPackIv, options);
 
+            mTitleStr = mPackInfo.pack_title;
+            if (!TextUtils.isEmpty(mTitleStr)) {
+                mTitleTv.setText(mTitleStr);
+            }
+
+            mBriefStr = mPackInfo.pack_brief_introduce;
+            if (!TextUtils.isEmpty(mBriefStr)) {
+                mBriefTv.setText(mBriefStr);
+            }
+
+            mDescStr = mPackInfo.pack_desc;
+            if (!TextUtils.isEmpty(mDescStr)) {
+                mDescTv.setText(mDescStr);
+            }
+
+            String person2 = mPackInfo.person2;
+            if ("0".equals(person2)) {
+                changePerson2State(false);
+            } else {
+                changePerson2State(true);
+                mPerson2Et.setText(person2);
+                mPerson2Et.setSelection(person2.length());
+            }
+
+            String person4 = mPackInfo.person4;
+            if ("0".equals(person4)) {
+                changePerson4State(false);
+            } else {
+                changePerson4State(true);
+                mPerson4Et.setText(person4);
+                mPerson4Et.setSelection(person4.length());
+            }
+
+            String maxQuantity = mPackInfo.max_quantity;
+            if (!TextUtils.isEmpty(maxQuantity)) {
+                mMaxQuantityTv.setText(maxQuantity);
+            }
+
+            mHowMadeStr = mPackInfo.how_it_work;
+            if (!TextUtils.isEmpty(mHowMadeStr)) {
+                mHowMadeTv.setText(mHowMadeStr);
+            }
+        }
+    }
+
+    private void changePerson2State(boolean check) {
+        if (check) {
+            mPerson2Cb.setImageResource(R.mipmap.menu_price_cb_check);
+            mPerson2Et.setVisibility(View.VISIBLE);
+        } else {
+            mPerson2Cb.setImageResource(R.mipmap.menu_price_cb_uncheck);
+            mPerson2Et.setText("");
+            mPerson2Et.setVisibility(View.GONE);
+        }
+    }
+
+    private void changePerson4State(boolean check) {
+        if (check) {
+            mPerson4Cb.setImageResource(R.mipmap.menu_price_cb_check);
+            mPerson4Et.setVisibility(View.VISIBLE);
+        } else {
+            mPerson4Cb.setImageResource(R.mipmap.menu_price_cb_uncheck);
+            mPerson4Et.setText("");
+            mPerson4Et.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -207,11 +315,31 @@ public class AddPackActivity extends BaseActivity implements View.OnClickListene
             case R.id.btn_next:
                 checkInputInfo();
                 break;
+            case R.id.cb_person2:
+                switch (mPerson2Et.getVisibility()){
+                    case View.VISIBLE:
+                        changePerson2State(false);
+                        break;
+                    case View.GONE:
+                        changePerson2State(true);
+                        break;
+                }
+                break;
+            case R.id.cb_person4:
+                switch (mPerson4Et.getVisibility()){
+                    case View.VISIBLE:
+                        changePerson4State(false);
+                        break;
+                    case View.GONE:
+                        changePerson4State(true);
+                        break;
+                }
+                break;
         }
     }
 
     private void checkInputInfo() {
-        if (mPackImgFile == null || !mPackImgFile.isFile() || !mPackImgFile.exists()) {
+        if (mPackInfo == null && (mPackImgFile == null || !mPackImgFile.isFile() || !mPackImgFile.exists())) {
             ToastUtils.show("Upload photo cannot be empty");
             return;
         }
@@ -230,21 +358,85 @@ public class AddPackActivity extends BaseActivity implements View.OnClickListene
 
         String person2 = mPerson2Et.getText().toString().trim();
         String person4 = mPerson4Et.getText().toString().trim();
-        if (TextUtils.isEmpty(person2)) {
-            ToastUtils.show("2 Persons cannot be empty");
+        if (TextUtils.isEmpty(person2) && TextUtils.isEmpty(person4)) {
+            ToastUtils.show("2 Persons and 4 Persons cannot be empty at the same time");
             return;
         }
-        if (TextUtils.isEmpty(person4)) {
-            ToastUtils.show("4 Persons cannot be empty");
-            return;
-        }
+
         String maxQuantity = mMaxQuantityTv.getText().toString();
         if (TextUtils.isEmpty(maxQuantity)) {
             ToastUtils.show("Maximum quantity cannot be empty");
             return;
         }
 
-        toAddPack(person2, person4, maxQuantity);
+        if (mPackInfo == null) {
+            toAddPack(person2, person4, maxQuantity);
+        } else {
+            if (mPackImgFile != null && mPackImgFile.isFile() && mPackImgFile.exists()) {
+                // 图片被修改过，所以需要重新上传
+                toEditPackWithImg(person2, person4, maxQuantity);
+            } else {
+                toEditPack(person2, person4, maxQuantity);
+            }
+        }
+    }
+
+    private void toEditPackWithImg(String person2, String person4, String maxQuantity) {
+        IEditPackWithImgPresent present = new EditPackWithImgPresent(this, new EditPackWithImgView() {
+            @Override
+            public void startLoading() {
+                showLoadingDialog(getString(R.string.loading_dialog_loading), true);
+            }
+
+            @Override
+            public void loadSuccess() {
+                editPackSuccessfully();
+            }
+
+            @Override
+            public void finishLoading() {
+                dismissLoadingDialog();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                ToastUtils.show(exception.getErrorMsg());
+            }
+        });
+        present.edit(mPackImgFile, mPackInfo.pack_id, mTitleStr, mBriefStr, mDescStr, person2, person4, maxQuantity, mHowMadeStr);
+    }
+
+    private void toEditPack(String person2, String person4, String maxQuantity) {
+        IEditPackPresent present = new EditPackPresent(this, new EditPackView() {
+            @Override
+            public void startLoading() {
+                showLoadingDialog(getString(R.string.loading_dialog_loading), true);
+            }
+
+            @Override
+            public void loadSuccess() {
+                editPackSuccessfully();
+            }
+
+            @Override
+            public void finishLoading() {
+                dismissLoadingDialog();
+            }
+
+            @Override
+            public void loadFailure(IchefzException exception) {
+                ToastUtils.show(exception.getErrorMsg());
+            }
+        });
+        present.edit(mPackInfo.pack_id, mTitleStr, mBriefStr, mDescStr, person2, person4, maxQuantity, mHowMadeStr);
+    }
+
+    private void editPackSuccessfully() {
+        ToastUtils.show("Edit pack successfully.");
+        AddPackActivity.this.finish();
+        AddPackEB addPackEB = new AddPackEB();
+        addPackEB.tag = AddPackEB.ADD_SUCCESS;
+        EventBus.getDefault().post(addPackEB);
     }
 
     private void toAddPack(String person2, String person4, String maxQuantity) {
@@ -275,6 +467,10 @@ public class AddPackActivity extends BaseActivity implements View.OnClickListene
             @Override
             public void loadFailure(IchefzException exception) {
                 ToastUtils.show(exception.getErrorMsg());
+                if (exception.getErrorCode() == 204) {
+                    // 厨师资料未完善，需要跳转到设置界面
+                    startActivity(new Intent(AddPackActivity.this, RestaurantSettingActivity.class));
+                }
             }
         });
         present.add(mPackImgFile, mTitleStr, mBriefStr, mDescStr, person2, person4, maxQuantity, mHowMadeStr);

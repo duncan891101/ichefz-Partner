@@ -10,16 +10,23 @@ import com.playhut.partner.networkservice.ConfirmOrderService;
 import com.playhut.partner.networkservice.ConfirmRefundService;
 import com.playhut.partner.networkservice.DeleteMenuService;
 import com.playhut.partner.networkservice.DeleteMsgService;
+import com.playhut.partner.networkservice.DeleteTipService;
 import com.playhut.partner.networkservice.EditBankInfoService;
 import com.playhut.partner.networkservice.EditKitchenAddressService;
+import com.playhut.partner.networkservice.EditPackService;
 import com.playhut.partner.networkservice.EditPersonInfoService;
 import com.playhut.partner.networkservice.EditRestaurantInfoService;
+import com.playhut.partner.networkservice.EditSetService;
 import com.playhut.partner.networkservice.FeedbackCenterService;
+import com.playhut.partner.networkservice.FeedbackService;
 import com.playhut.partner.networkservice.ForgotPwdService;
 import com.playhut.partner.networkservice.GetMenuPackListService;
 import com.playhut.partner.networkservice.GetMenuSetListService;
+import com.playhut.partner.networkservice.GetPackTipsService;
 import com.playhut.partner.networkservice.GetRestaurantInfoService;
 import com.playhut.partner.networkservice.HistoryOrderService;
+import com.playhut.partner.networkservice.IncomeOrderService;
+import com.playhut.partner.networkservice.IncomeService;
 import com.playhut.partner.networkservice.LoginService;
 import com.playhut.partner.networkservice.LogoutService;
 import com.playhut.partner.networkservice.MainInfoService;
@@ -182,7 +189,7 @@ public class NetworkModel {
         Map<String, String> privateMap = new TreeMap<>();
         privateMap.put("country", country);
         privateMap.put("street_address", street);
-        if (!TextUtils.isEmpty(apt)){
+        if (!TextUtils.isEmpty(apt)) {
             privateMap.put("apt", apt);
         }
         privateMap.put("city", city);
@@ -225,8 +232,16 @@ public class NetworkModel {
         privateMap.put("pack_ids", packIds);
         privateMap.put("title", setName);
         privateMap.put("desc", desc);
-        privateMap.put("person2", person2);
-        privateMap.put("person4", person4);
+        if (!TextUtils.isEmpty(person2)) {
+            privateMap.put("person2", person2);
+        } else {
+            privateMap.put("person2", String.valueOf(-1));
+        }
+        if (!TextUtils.isEmpty(person4)) {
+            privateMap.put("person4", person4);
+        } else {
+            privateMap.put("person4", String.valueOf(-1));
+        }
         privateMap.put("max_quantity", maxQuantity);
         Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
         AddSetService addSetService = ApiManager.create(AddSetService.class);
@@ -295,9 +310,10 @@ public class NetworkModel {
     /**
      * 拒绝退款
      */
-    public Observable<ResponseBody> rejectRefund(String orderId) {
+    public Observable<ResponseBody> rejectRefund(String orderId, String reason) {
         Map<String, String> privateMap = new TreeMap<>();
         privateMap.put("order_id", orderId);
+        privateMap.put("reject_reason", reason);
         Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
         RejectRefundService rejectRefundService = ApiManager.create(RejectRefundService.class);
         return rejectRefundService.reject(fieldMap);
@@ -399,6 +415,119 @@ public class NetworkModel {
         Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
         ChangeMenuStateService changeMenuStateService = ApiManager.create(ChangeMenuStateService.class);
         return changeMenuStateService.change(fieldMap);
+    }
+
+    /**
+     * edit pack
+     */
+    public Observable<ResponseBody> editPack(String menuId, String title, String brief, String desc, String person2, String person4,
+                                             String maxQuantity, String howMade) {
+        Map<String, String> privateMap = new TreeMap<>();
+        privateMap.put("menu_id", menuId);
+        privateMap.put("title", title);
+        privateMap.put("brief_introduction", brief);
+        privateMap.put("desc", desc);
+        if (!TextUtils.isEmpty(person2)) {
+            privateMap.put("person2", person2);
+        } else {
+            privateMap.put("person2", String.valueOf(-1));
+        }
+        if (!TextUtils.isEmpty(person4)) {
+            privateMap.put("person4", person4);
+        } else {
+            privateMap.put("person4", String.valueOf(-1));
+        }
+        privateMap.put("max_quantity", maxQuantity);
+        if (!TextUtils.isEmpty(howMade)) {
+            privateMap.put("how_it_make", howMade);
+        }
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
+        EditPackService editPackService = ApiManager.create(EditPackService.class);
+        return editPackService.edit(fieldMap);
+    }
+
+    /**
+     * 获取菜的做法、材料等
+     */
+    public Observable<ResponseBody> getPackTip(String menuId, int type) {
+        Map<String, String> privateMap = new TreeMap<>();
+        privateMap.put("menu_id", menuId);
+        privateMap.put("type", String.valueOf(type));
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
+        GetPackTipsService getPackTipsService = ApiManager.create(GetPackTipsService.class);
+        return getPackTipsService.get(fieldMap);
+    }
+
+    /**
+     * delete tip
+     */
+    public Observable<ResponseBody> deleteTip(String menuId, int type, String id) {
+        Map<String, String> privateMap = new TreeMap<>();
+        privateMap.put("menu_id", menuId);
+        privateMap.put("id", id);
+        privateMap.put("type", String.valueOf(type));
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
+        DeleteTipService deleteTipService = ApiManager.create(DeleteTipService.class);
+        return deleteTipService.delete(fieldMap);
+    }
+
+    /**
+     * edit set
+     */
+    public Observable<ResponseBody> editSet(String menuId, String ids, String title, String desc, String person2, String person4, String maxQuantity) {
+        Map<String, String> privateMap = new TreeMap<>();
+        privateMap.put("menu_id", menuId);
+        privateMap.put("pack_ids", ids);
+        privateMap.put("title", title);
+        privateMap.put("desc", desc);
+        if (!TextUtils.isEmpty(person2)) {
+            privateMap.put("person2", person2);
+        } else {
+            privateMap.put("person2", String.valueOf(-1));
+        }
+        if (!TextUtils.isEmpty(person4)) {
+            privateMap.put("person4", person4);
+        } else {
+            privateMap.put("person4", String.valueOf(-1));
+        }
+        privateMap.put("max_quantity", maxQuantity);
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
+        EditSetService editSetService = ApiManager.create(EditSetService.class);
+        return editSetService.edit(fieldMap);
+    }
+
+    /**
+     * 评论列表
+     */
+    public Observable<ResponseBody> getFeedbackList(int page, int pageSize) {
+        Map<String, String> privateMap = new TreeMap<>();
+        privateMap.put("page", String.valueOf(page));
+        privateMap.put("page_size", String.valueOf(pageSize));
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
+        FeedbackService feedbackService = ApiManager.create(FeedbackService.class);
+        return feedbackService.getList(fieldMap);
+    }
+
+    /**
+     * 厨师收入
+     */
+    public Observable<ResponseBody> getIncome() {
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(null);
+        IncomeService incomeService = ApiManager.create(IncomeService.class);
+        return incomeService.getIncome(fieldMap);
+    }
+
+    /**
+     * 厨师收入订单
+     */
+    public Observable<ResponseBody> getIncomeOrderList(String date, int page, int pageSize) {
+        Map<String, String> privateMap = new TreeMap<>();
+        privateMap.put("date", date);
+        privateMap.put("page", String.valueOf(page));
+        privateMap.put("page_size", String.valueOf(pageSize));
+        Map<String, String> fieldMap = FieldMapManager.getFieldMap(privateMap);
+        IncomeOrderService incomeOrderService = ApiManager.create(IncomeOrderService.class);
+        return incomeOrderService.getList(fieldMap);
     }
 
 }

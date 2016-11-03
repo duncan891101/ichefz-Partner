@@ -184,14 +184,14 @@ public class MyMenuActivity extends BaseActivity implements View.OnClickListener
                 @Override
                 public void onClick(View v) {
                     dismissPopupWindow();
-                    startActivity(new Intent(MyMenuActivity.this, AddPackActivity.class));
+                    AddPackActivity.actionIntent(MyMenuActivity.this, null);
                 }
             });
             addSetTv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     dismissPopupWindow();
-                    startActivity(new Intent(MyMenuActivity.this, AddSetActivity.class));
+                    AddSetActivity.actionIntent(MyMenuActivity.this, null);
                 }
             });
         }

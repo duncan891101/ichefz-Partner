@@ -53,7 +53,6 @@
                 android:background="#0099CC"
                 android:text="Next"
                 android:textAllCaps="false"
-                android:visibility="gone"
                 android:textColor="@android:color/white"
                 android:textSize="16dp" />
 

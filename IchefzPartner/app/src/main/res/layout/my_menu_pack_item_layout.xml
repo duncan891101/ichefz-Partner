@@ -41,27 +41,30 @@
             android:textSize="13dp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tv_person4"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/iv_menu"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/iv_menu"
-            android:text="Persons 4"
-            android:textColor="#333333"
-            android:textSize="13dp" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_person2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/tv_person4"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/iv_menu"
-            android:text="Persons 2"
-            android:textColor="#333333"
-            android:textSize="13dp" />
+            <TextView
+                android:id="@+id/tv_person2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Persons 2"
+                android:textColor="#333333"
+                android:textSize="13dp" />
+
+            <TextView
+                android:id="@+id/tv_person4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Persons 4"
+                android:textColor="#333333"
+                android:textSize="13dp" />
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/iv_arrow"

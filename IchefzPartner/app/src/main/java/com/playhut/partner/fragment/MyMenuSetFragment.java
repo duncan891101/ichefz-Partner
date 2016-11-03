@@ -3,6 +3,7 @@ package com.playhut.partner.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import com.playhut.partner.R;
 import com.playhut.partner.adapter.MyMenuSetAdapter;
 import com.playhut.partner.business.LoadFailureBusiness;
 import com.playhut.partner.entity.MyMenuSetEntity;
+import com.playhut.partner.eventbus.AddPackEB;
+import com.playhut.partner.eventbus.AddSetEB;
 import com.playhut.partner.mvp.presenter.IGetMenuSetListPresent;
 import com.playhut.partner.mvp.presenter.impl.GetMenuSetListPresent;
 import com.playhut.partner.mvp.view.GetMenuSetListView;
@@ -22,6 +25,9 @@ import com.playhut.partner.utils.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
 
 /**
  *
@@ -88,6 +94,7 @@ public class MyMenuSetFragment extends Fragment implements PullToRefreshBase.OnR
         mPullToRefreshListView = (PullToRefreshListView) mRootView.findViewById(R.id.lv_pull_refresh);
         mListView = mPullToRefreshListView.getRefreshableView();
         mPullToRefreshListView.setOnRefreshListener(this);
+        EventBus.getDefault().register(this);
 
         mListView.setDividerHeight(0);
         mList = new ArrayList<>();
@@ -200,6 +207,23 @@ public class MyMenuSetFragment extends Fragment implements PullToRefreshBase.OnR
 
     public void showNoItemView() {
         mPullToRefreshListView.mIchefzStateView.showNoItemView("There is no set item");
+    }
+
+    @Subscribe
+    public void onEventMainThread(AddSetEB addSetEB) {
+        String tag = addSetEB.tag;
+        if (!TextUtils.isEmpty(tag) && tag.equals(AddSetEB.ADD_SUCCESS)){
+            // 刷新列表
+            mPage = 1;
+            mTotalPage = 1;
+            toGetMenuSetList(true);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
     }
 
 }

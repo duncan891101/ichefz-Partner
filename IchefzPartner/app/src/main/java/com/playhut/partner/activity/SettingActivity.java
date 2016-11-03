@@ -2,7 +2,6 @@ package com.playhut.partner.activity;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -34,11 +33,11 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
 
     private Dialog mLogoutDialog;
 
-    private Dialog mContactUsDialog;
+//    private Dialog mContactUsDialog;
 
-    public static final String CONTACT_PHONE_NUMBER = "10086";
-
-    public static final String CONTACT_EMAIL = "1462050620@qq.com";
+//    public static final String CONTACT_PHONE_NUMBER = "10086";
+//
+//    public static final String CONTACT_EMAIL = "1462050620@qq.com";
 
     @Override
     protected void initView() {
@@ -48,7 +47,7 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
 
         findViewById(R.id.rl_feedback_center).setOnClickListener(this);
         findViewById(R.id.rl_clear_cache).setOnClickListener(this);
-        findViewById(R.id.rl_contact_us).setOnClickListener(this);
+//        findViewById(R.id.rl_contact_us).setOnClickListener(this);
     }
 
     @Override
@@ -88,55 +87,55 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
             case R.id.rl_clear_cache:
                 toClearCache();
                 break;
-            case R.id.rl_contact_us:
-                showContactUsDialog();
-                break;
+//            case R.id.rl_contact_us:
+//                showContactUsDialog();
+//                break;
         }
     }
 
-    private void showContactUsDialog() {
-        if (mContactUsDialog == null || !mContactUsDialog.isShowing()) {
-            mContactUsDialog = DialogUtils.showChooseAvatarDialog(this, R.layout.choose_avatar_dialog_layout, true, false);
-        }
-        TextView cancelTv = (TextView) mContactUsDialog.findViewById(R.id.tv_cancel);
-        cancelTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismissContactUsDialog();
-            }
-        });
-
-        TextView phoneTv = (TextView) mContactUsDialog.findViewById(R.id.tv_take_photo);
-        phoneTv.setText(CONTACT_PHONE_NUMBER);
-        phoneTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismissContactUsDialog();
-                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + CONTACT_PHONE_NUMBER));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        });
-
-        TextView emailTv = (TextView) mContactUsDialog.findViewById(R.id.tv_from_album);
-        emailTv.setText(CONTACT_EMAIL);
-        emailTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismissContactUsDialog();
-                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + CONTACT_EMAIL));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        });
-    }
-
-    private void dismissContactUsDialog() {
-        if (mContactUsDialog != null && mContactUsDialog.isShowing()) {
-            mContactUsDialog.dismiss();
-            mContactUsDialog = null;
-        }
-    }
+//    private void showContactUsDialog() {
+//        if (mContactUsDialog == null || !mContactUsDialog.isShowing()) {
+//            mContactUsDialog = DialogUtils.showChooseAvatarDialog(this, R.layout.choose_avatar_dialog_layout, true, false);
+//        }
+//        TextView cancelTv = (TextView) mContactUsDialog.findViewById(R.id.tv_cancel);
+//        cancelTv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dismissContactUsDialog();
+//            }
+//        });
+//
+//        TextView phoneTv = (TextView) mContactUsDialog.findViewById(R.id.tv_take_photo);
+//        phoneTv.setText(CONTACT_PHONE_NUMBER);
+//        phoneTv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dismissContactUsDialog();
+//                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + CONTACT_PHONE_NUMBER));
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        TextView emailTv = (TextView) mContactUsDialog.findViewById(R.id.tv_from_album);
+//        emailTv.setText(CONTACT_EMAIL);
+//        emailTv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dismissContactUsDialog();
+//                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + CONTACT_EMAIL));
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+//            }
+//        });
+//    }
+//
+//    private void dismissContactUsDialog() {
+//        if (mContactUsDialog != null && mContactUsDialog.isShowing()) {
+//            mContactUsDialog.dismiss();
+//            mContactUsDialog = null;
+//        }
+//    }
 
     private void toClearCache() {
         new CleanCacheTask(this).executeOnExecutor(PartnerApplication.mApp.getMultiThreadExecutor());

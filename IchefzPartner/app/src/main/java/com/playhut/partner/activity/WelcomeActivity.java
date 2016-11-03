@@ -5,6 +5,8 @@ import android.content.Intent;
 import com.playhut.partner.R;
 import com.playhut.partner.base.BaseActivity;
 import com.playhut.partner.base.PartnerApplication;
+import com.playhut.partner.constants.IntroduceConstants;
+import com.playhut.partner.utils.SPUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
@@ -65,13 +67,18 @@ public class WelcomeActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (PartnerApplication.mAccount != null && PartnerApplication.mAccount.isAccountValid()) {
-                    // 已登录
-                    Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
-                    startActivity(intent);
+                boolean result = SPUtils.getBooleanWithOther(IntroduceConstants.IS_FIRST_TO_APP);
+                if (!result) {
+                    startActivity(new Intent(WelcomeActivity.this, IntroduceActivity.class));
                 } else {
-                    // 未登录
-                    startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
+                    if (PartnerApplication.mAccount != null && PartnerApplication.mAccount.isAccountValid()) {
+                        // 已登录
+                        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    } else {
+                        // 未登录
+                        startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
+                    }
                 }
                 WelcomeActivity.this.finish();
             }

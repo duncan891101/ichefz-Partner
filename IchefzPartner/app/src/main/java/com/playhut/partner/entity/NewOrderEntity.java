@@ -22,6 +22,7 @@ public class NewOrderEntity {
         public int chef_handle;
         public String subtotal;
         public List<OrderItem> order_items;
+        public String refund_reason;
     }
 
     public static class OrderItem {
